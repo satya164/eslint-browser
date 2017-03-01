@@ -146,6 +146,22 @@ function generateRulesIndex(basedir) {
         output += `    rules["${basename}"] = require("./rules/${basename}");\n`;
     });
 
+    const plugins = {
+        babel: "/rules",
+        react: "/lib/rules",
+        "react-native": "/lib/rules"
+    };
+
+    Object.keys(plugins).forEach(plugin => {
+        const rulesPath = `eslint-plugin-${plugin}/${plugins[plugin]}/`;
+
+        find(`${__dirname}/node_modules/${rulesPath}`).filter(fileType("js")).forEach(filename => {
+            const basename = path.basename(filename, ".js");
+
+            output += `    rules["${plugin}/${basename.replace(/([a-zA-Z])(?=[A-Z])/g, "$1-").toLowerCase()}"] = require("${rulesPath}/${basename}");\n`;
+        });
+    });
+
     output += "\n    return rules;\n};";
     output.to(`${basedir}load-rules.js`);
 }
