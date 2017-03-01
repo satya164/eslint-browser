@@ -79,7 +79,6 @@
   },
   "devDependencies": {
     "babel-core": "^6.26.3",
-    "babel-polyfill": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
     "babelify": "^8.0.0",
     "beefy": "^2.1.8",

@@ -840,8 +840,8 @@ target.browserify = function() {
     // 6. Browserify espree
     exec(`${getBinFile("browserify")} -r espree -o ${TEMP_DIR}espree.js`);
 
-    // 7. Concatenate Babel polyfill, Espree, and ESLint files together
-    cat("./node_modules/babel-polyfill/dist/polyfill.js", `${TEMP_DIR}espree.js`, `${BUILD_DIR}eslint.js`).to(`${BUILD_DIR}eslint.js`);
+    // 7. Concatenate Espree, and ESLint files together
+    cat(`${TEMP_DIR}espree.js`, `${BUILD_DIR}eslint.js`).to(`${BUILD_DIR}eslint.js`);
 
     // 8. remove temp directory
     rm("-r", TEMP_DIR);
