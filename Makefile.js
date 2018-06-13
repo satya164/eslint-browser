@@ -77,7 +77,7 @@ const NODE = "node ", // intentional extra space
     // Files
     MAKEFILE = "./Makefile.js",
     JS_FILES = "\"lib/**/*.js\" \"conf/**/*.js\" \"bin/**/*.js\" \"tools/**/*.js\"",
-    JSON_FILES = find("conf/").filter(fileType("json")),
+    JSON_FILES = ls("conf/").filter(fileType("json")),
     MARKDOWN_FILES_ARRAY = find("docs/").concat(ls(".")).filter(fileType("md")),
     TEST_FILES = getTestFilePatterns(),
     PERF_ESLINTRC = path.join(PERF_TMP_DIR, "eslintrc.yml"),
@@ -140,7 +140,7 @@ function generateRulesIndex(basedir) {
 
     output += "    var rules = Object.create(null);\n";
 
-    find(`${basedir}rules/`).filter(fileType("js")).forEach(filename => {
+    ls(`${basedir}rules/`).filter(fileType("js")).forEach(filename => {
         const basename = path.basename(filename, ".js");
 
         output += `    rules["${basename}"] = require("./rules/${basename}");\n`;
@@ -148,6 +148,7 @@ function generateRulesIndex(basedir) {
 
     const plugins = {
         babel: "/rules",
+        flowtype: "/dist/rules",
         react: "/lib/rules",
         "react-native": "/lib/rules"
     };
@@ -155,7 +156,7 @@ function generateRulesIndex(basedir) {
     Object.keys(plugins).forEach(plugin => {
         const rulesPath = `eslint-plugin-${plugin}/${plugins[plugin]}/`;
 
-        find(`${__dirname}/node_modules/${rulesPath}`).filter(fileType("js")).forEach(filename => {
+        ls(`${__dirname}/node_modules/${rulesPath}`).filter(fileType("js")).forEach(filename => {
             const basename = path.basename(filename, ".js");
 
             output += `    rules["${plugin}/${basename.replace(/([a-zA-Z])(?=[A-Z])/g, "$1-").toLowerCase()}"] = require("${rulesPath}/${basename}");\n`;
@@ -239,7 +240,7 @@ function generateRuleIndexPage(basedir) {
         categoryList = "conf/category-list.json",
         categoriesData = JSON.parse(cat(path.resolve(categoryList)));
 
-    find(path.join(basedir, "/lib/rules/")).filter(fileType("js"))
+    ls(path.join(basedir, "/lib/rules/")).filter(fileType("js"))
         .map(filename => [filename, path.basename(filename, ".js")])
         .sort((a, b) => a[1].localeCompare(b[1]))
         .forEach(pair => {
@@ -853,7 +854,7 @@ target.checkRuleFiles = function() {
 
     const eslintRecommended = require("./conf/eslint-recommended").rules;
 
-    const ruleFiles = find("lib/rules/").filter(fileType("js"));
+    const ruleFiles = ls("lib/rules/").filter(fileType("js"));
     let errors = 0;
 
     ruleFiles.forEach(filename => {

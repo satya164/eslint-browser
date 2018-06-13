@@ -2365,6 +2365,12 @@ eslint-plugin-eslint-plugin@^1.2.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-eslint-plugin/-/eslint-plugin-eslint-plugin-1.4.0.tgz#382dc6692a741a52072d5f3fff5dacdcf291ef49"
 
+eslint-plugin-flowtype@^2.49.3:
+  version "2.49.3"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-flowtype/-/eslint-plugin-flowtype-2.49.3.tgz#ccca6ee5ba2027eb3ed36bc2ec8c9a842feee841"
+  dependencies:
+    lodash "^4.17.10"
+
 eslint-plugin-node@^6.0.1:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/eslint-plugin-node/-/eslint-plugin-node-6.0.1.tgz#bf19642298064379315d7a4b2a75937376fa05e4"
