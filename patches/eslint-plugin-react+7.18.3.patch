@@ -1,0 +1,35 @@
+diff --git a/node_modules/eslint-plugin-react/lib/util/version.js b/node_modules/eslint-plugin-react/lib/util/version.js
+index ff7397c..5612873 100644
+--- a/node_modules/eslint-plugin-react/lib/util/version.js
++++ b/node_modules/eslint-plugin-react/lib/util/version.js
+@@ -5,7 +5,6 @@
+ 
+ 'use strict';
+ 
+-const resolve = require('resolve');
+ const error = require('./error');
+ 
+ let warnedForMissingVersion = false;
+@@ -15,21 +14,7 @@ function resetWarningFlag() {
+ }
+ 
+ function detectReactVersion() {
+-  try {
+-    const reactPath = resolve.sync('react', {basedir: process.cwd()});
+-    const react = require(reactPath); // eslint-disable-line global-require, import/no-dynamic-require
+-    return react.version;
+-  } catch (e) {
+-    if (e.code === 'MODULE_NOT_FOUND') {
+-      if (!warnedForMissingVersion) {
+-        error('Warning: React version was set to "detect" in eslint-plugin-react settings, ' +
+-        'but the "react" package is not installed. Assuming latest React version for linting.');
+-        warnedForMissingVersion = true;
+-      }
+-      return '999.999.999';
+-    }
+-    throw e;
+-  }
++  return '999.999.999';
+ }
+ 
+ function getReactVersionFromContext(context) {

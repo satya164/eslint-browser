@@ -1,9 +1,11 @@
 "use strict";
 
+const path = require("path");
+
 module.exports = {
     mode: "none",
     entry: {
-        eslint: ["core-js/stable", "regenerator-runtime/runtime", "./lib/linter/linter.js"]
+        eslint: "./lib/api.js"
     },
     output: {
         filename: "[name].js",
@@ -42,5 +44,12 @@ module.exports = {
             }
         ]
     },
-    stats: "errors-only"
+    stats: "errors-only",
+    resolve: {
+        alias: {
+            eslint$: require.resolve("./lib/api.js"),
+            "eslint/lib": path.resolve("./lib"),
+            "eslint-scope": "eslint-scope"
+        }
+    },
 };
