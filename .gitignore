@@ -1,5 +1,6 @@
 /node_modules
 test.js
+custom-rules.js
 coverage/
 build/
 npm-debug.log

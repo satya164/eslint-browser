@@ -1,0 +1,61 @@
+diff --git a/node_modules/eslint-plugin-react/lib/util/version.js b/node_modules/eslint-plugin-react/lib/util/version.js
+index 951837b..4b48f04 100644
+--- a/node_modules/eslint-plugin-react/lib/util/version.js
++++ b/node_modules/eslint-plugin-react/lib/util/version.js
+@@ -5,7 +5,6 @@
+ 
+ 'use strict';
+ 
+-const resolve = require('resolve');
+ const error = require('./error');
+ 
+ let warnedForMissingVersion = false;
+@@ -21,27 +20,7 @@ function resetDetectedVersion() {
+ }
+ 
+ function detectReactVersion() {
+-  if (cachedDetectedReactVersion) {
+-    return cachedDetectedReactVersion;
+-  }
+-
+-  try {
+-    const reactPath = resolve.sync('react', {basedir: process.cwd()});
+-    const react = require(reactPath); // eslint-disable-line global-require, import/no-dynamic-require
+-    cachedDetectedReactVersion = react.version;
+-    return cachedDetectedReactVersion;
+-  } catch (e) {
+-    if (e.code === 'MODULE_NOT_FOUND') {
+-      if (!warnedForMissingVersion) {
+-        error('Warning: React version was set to "detect" in eslint-plugin-react settings, '
+-        + 'but the "react" package is not installed. Assuming latest React version for linting.');
+-        warnedForMissingVersion = true;
+-      }
+-      cachedDetectedReactVersion = '999.999.999';
+-      return cachedDetectedReactVersion;
+-    }
+-    throw e;
+-  }
++  return '999.999.999';
+ }
+ 
+ function getReactVersionFromContext(context) {
+@@ -67,18 +46,7 @@ function getReactVersionFromContext(context) {
+ }
+ 
+ function detectFlowVersion() {
+-  try {
+-    const flowPackageJsonPath = resolve.sync('flow-bin/package.json', {basedir: process.cwd()});
+-    const flowPackageJson = require(flowPackageJsonPath); // eslint-disable-line global-require, import/no-dynamic-require
+-    return flowPackageJson.version;
+-  } catch (e) {
+-    if (e.code === 'MODULE_NOT_FOUND') {
+-      error('Warning: Flow version was set to "detect" in eslint-plugin-react settings, '
+-        + 'but the "flow-bin" package is not installed. Assuming latest Flow version for linting.');
+-      return '999.999.999';
+-    }
+-    throw e;
+-  }
++  return '999.999.999';
+ }
+ 
+ function getFlowVersionFromContext(context) {

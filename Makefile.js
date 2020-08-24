@@ -776,6 +776,7 @@ target.gensite = function(prereleaseVersion) {
 };
 
 target.webpack = function(mode = "none") {
+    exec("node update-rules.js");
     exec(`${getBinFile("webpack")} --mode=${mode} --output-path=${BUILD_DIR}`);
 };
 

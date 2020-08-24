@@ -1,0 +1,78 @@
+diff --git a/node_modules/eslint-plugin-react-native/lib/rules/no-color-literals.js b/node_modules/eslint-plugin-react-native/lib/rules/no-color-literals.js
+index 005c764..5eee3ac 100644
+--- a/node_modules/eslint-plugin-react-native/lib/rules/no-color-literals.js
++++ b/node_modules/eslint-plugin-react-native/lib/rules/no-color-literals.js
+@@ -12,7 +12,7 @@ const styleSheet = require('../util/stylesheet');
+ const { StyleSheets } = styleSheet;
+ const { astHelpers } = styleSheet;
+ 
+-module.exports = Components.detect((context) => {
++module.exports.create = Components.detect((context) => {
+   const styleSheets = new StyleSheets();
+ 
+   function reportColorLiterals(colorLiterals) {
+diff --git a/node_modules/eslint-plugin-react-native/lib/rules/no-inline-styles.js b/node_modules/eslint-plugin-react-native/lib/rules/no-inline-styles.js
+index a13f98f..e2c955e 100644
+--- a/node_modules/eslint-plugin-react-native/lib/rules/no-inline-styles.js
++++ b/node_modules/eslint-plugin-react-native/lib/rules/no-inline-styles.js
+@@ -12,7 +12,7 @@ const styleSheet = require('../util/stylesheet');
+ const { StyleSheets } = styleSheet;
+ const { astHelpers } = styleSheet;
+ 
+-module.exports = Components.detect((context) => {
++module.exports.create = Components.detect((context) => {
+   const styleSheets = new StyleSheets();
+ 
+   function reportInlineStyles(inlineStyles) {
+diff --git a/node_modules/eslint-plugin-react-native/lib/rules/no-raw-text.js b/node_modules/eslint-plugin-react-native/lib/rules/no-raw-text.js
+index b25593a..2e53ea0 100644
+--- a/node_modules/eslint-plugin-react-native/lib/rules/no-raw-text.js
++++ b/node_modules/eslint-plugin-react-native/lib/rules/no-raw-text.js
+@@ -23,7 +23,7 @@ const elementName = (node, scope) => {
+   return identifiers.join('.');
+ };
+ 
+-module.exports = (context) => {
++module.exports.create = (context) => {
+   const options = context.options[0] || {};
+ 
+   const report = (node) => {
+diff --git a/node_modules/eslint-plugin-react-native/lib/rules/no-unused-styles.js b/node_modules/eslint-plugin-react-native/lib/rules/no-unused-styles.js
+index f91d501..6fcc328 100644
+--- a/node_modules/eslint-plugin-react-native/lib/rules/no-unused-styles.js
++++ b/node_modules/eslint-plugin-react-native/lib/rules/no-unused-styles.js
+@@ -11,7 +11,7 @@ const styleSheet = require('../util/stylesheet');
+ const { StyleSheets } = styleSheet;
+ const { astHelpers } = styleSheet;
+ 
+-module.exports = Components.detect((context, components) => {
++module.exports.create = Components.detect((context, components) => {
+   const styleSheets = new StyleSheets();
+   const styleReferences = new Set();
+ 
+diff --git a/node_modules/eslint-plugin-react-native/lib/rules/sort-styles.js b/node_modules/eslint-plugin-react-native/lib/rules/sort-styles.js
+index fd8fb15..58ea09e 100644
+--- a/node_modules/eslint-plugin-react-native/lib/rules/sort-styles.js
++++ b/node_modules/eslint-plugin-react-native/lib/rules/sort-styles.js
+@@ -23,7 +23,7 @@ const {
+ // Rule Definition
+ //------------------------------------------------------------------------------
+ 
+-module.exports = (context) => {
++module.exports.create = (context) => {
+   const order = context.options[0] || 'asc';
+   const options = context.options[1] || {};
+   const { ignoreClassNames } = options;
+diff --git a/node_modules/eslint-plugin-react-native/lib/rules/split-platform-components.js b/node_modules/eslint-plugin-react-native/lib/rules/split-platform-components.js
+index 32ab913..e6f5e11 100644
+--- a/node_modules/eslint-plugin-react-native/lib/rules/split-platform-components.js
++++ b/node_modules/eslint-plugin-react-native/lib/rules/split-platform-components.js
+@@ -6,7 +6,7 @@
+ 
+ 'use strict';
+ 
+-module.exports = function (context) {
++module.exports.create = function (context) {
+   let reactComponents = [];
+   const androidMessage = 'Android components should be placed in android files';
+   const iosMessage = 'IOS components should be placed in ios files';
