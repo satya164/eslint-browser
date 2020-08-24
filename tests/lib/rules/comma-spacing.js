@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 
 const rule = require("../../../lib/rules/comma-spacing"),
-    RuleTester = require("../../../lib/testers/rule-tester");
+    { RuleTester } = require("../../../lib/rule-tester");
 
 //------------------------------------------------------------------------------
 // Tests
@@ -61,6 +61,10 @@ ruleTester.run("comma-spacing", rule, {
         "['  ,  ']",
         { code: "[`  ,  `]", parserOptions: { ecmaVersion: 6 } },
         { code: "`${[1, 2]}`", parserOptions: { ecmaVersion: 6 } },
+        { code: "fn(a, b,)", parserOptions: { ecmaVersion: 2018 } }, // #11295
+        { code: "const fn = (a, b,) => {}", parserOptions: { ecmaVersion: 2018 } }, // #11295
+        { code: "const fn = function (a, b,) {}", parserOptions: { ecmaVersion: 2018 } }, // #11295
+        { code: "function fn(a, b,) {}", parserOptions: { ecmaVersion: 2018 } }, // #11295
         "foo(/,/, 'a')",
         "var x = ',,,,,';",
         "var code = 'var foo = 1, bar = 3;'",
@@ -131,11 +135,13 @@ ruleTester.run("comma-spacing", rule, {
             options: [{ before: true, after: true }],
             errors: [
                 {
-                    message: "A space is required before ','.",
+                    messageId: "missing",
+                    data: { loc: "before" },
                     type: "Punctuator"
                 },
                 {
-                    message: "A space is required after ','.",
+                    messageId: "missing",
+                    data: { loc: "after" },
                     type: "Punctuator"
                 }
             ]
@@ -146,11 +152,13 @@ ruleTester.run("comma-spacing", rule, {
             options: [{ before: true, after: true }],
             errors: [
                 {
-                    message: "A space is required before ','.",
+                    messageId: "missing",
+                    data: { loc: "before" },
                     type: "Punctuator"
                 },
                 {
-                    message: "A space is required after ','.",
+                    messageId: "missing",
+                    data: { loc: "after" },
                     type: "Punctuator"
                 }
             ]
@@ -164,7 +172,8 @@ ruleTester.run("comma-spacing", rule, {
                     type: "Punctuator"
                 },
                 {
-                    message: "A space is required after ','.",
+                    messageId: "missing",
+                    data: { loc: "after" },
                     type: "Punctuator"
                 }
             ]
@@ -209,7 +218,8 @@ ruleTester.run("comma-spacing", rule, {
                     type: "Punctuator"
                 },
                 {
-                    message: "A space is required after ','.",
+                    messageId: "missing",
+                    data: { loc: "after" },
                     type: "Punctuator"
                 }
             ]
@@ -230,7 +240,8 @@ ruleTester.run("comma-spacing", rule, {
             options: [{ before: true, after: false }],
             errors: [
                 {
-                    message: "A space is required before ','.",
+                    messageId: "missing",
+                    data: { loc: "before" },
                     type: "Punctuator"
                 },
                 {
@@ -256,7 +267,8 @@ ruleTester.run("comma-spacing", rule, {
             options: [{ before: true, after: false }],
             errors: [
                 {
-                    message: "A space is required before ','.",
+                    messageId: "missing",
+                    data: { loc: "before" },
                     type: "Punctuator"
                 }
             ]
@@ -267,7 +279,8 @@ ruleTester.run("comma-spacing", rule, {
             options: [{ before: true, after: false }],
             errors: [
                 {
-                    message: "A space is required before ','.",
+                    messageId: "missing",
+                    data: { loc: "before" },
                     type: "Punctuator"
                 },
                 {
@@ -282,7 +295,8 @@ ruleTester.run("comma-spacing", rule, {
             options: [{ before: false, after: true }],
             errors: [
                 {
-                    message: "A space is required after ','.",
+                    messageId: "missing",
+                    data: { loc: "after" },
                     type: "Punctuator"
                 }
             ]
@@ -304,7 +318,8 @@ ruleTester.run("comma-spacing", rule, {
             options: [{ before: true, after: true }],
             errors: [
                 {
-                    message: "A space is required after ','.",
+                    messageId: "missing",
+                    data: { loc: "after" },
                     type: "Punctuator"
                 }
             ]
@@ -315,11 +330,13 @@ ruleTester.run("comma-spacing", rule, {
             options: [{ before: true, after: true }],
             errors: [
                 {
-                    message: "A space is required before ','.",
+                    messageId: "missing",
+                    data: { loc: "before" },
                     type: "Punctuator"
                 },
                 {
-                    message: "A space is required after ','.",
+                    messageId: "missing",
+                    data: { loc: "after" },
                     type: "Punctuator"
                 }
             ]
@@ -330,11 +347,13 @@ ruleTester.run("comma-spacing", rule, {
             options: [{ before: true, after: true }],
             errors: [
                 {
-                    message: "A space is required before ','.",
+                    messageId: "missing",
+                    data: { loc: "before" },
                     type: "Punctuator"
                 },
                 {
-                    message: "A space is required after ','.",
+                    messageId: "missing",
+                    data: { loc: "after" },
                     type: "Punctuator"
                 }
             ]
@@ -364,7 +383,8 @@ ruleTester.run("comma-spacing", rule, {
                     type: "Punctuator"
                 },
                 {
-                    message: "A space is required after ','.",
+                    messageId: "missing",
+                    data: { loc: "after" },
                     type: "Punctuator"
                 }
             ]
@@ -375,11 +395,13 @@ ruleTester.run("comma-spacing", rule, {
             options: [{ before: true, after: true }],
             errors: [
                 {
-                    message: "A space is required before ','.",
+                    messageId: "missing",
+                    data: { loc: "before" },
                     type: "Punctuator"
                 },
                 {
-                    message: "A space is required after ','.",
+                    messageId: "missing",
+                    data: { loc: "after" },
                     type: "Punctuator"
                 }
             ]
@@ -387,15 +409,17 @@ ruleTester.run("comma-spacing", rule, {
         {
             code: "var foo = (a,b) => {}",
             output: "var foo = (a , b) => {}",
-            parserOptions: { ecmaVersion: 6 },
             options: [{ before: true, after: true }],
+            parserOptions: { ecmaVersion: 6 },
             errors: [
                 {
-                    message: "A space is required before ','.",
+                    messageId: "missing",
+                    data: { loc: "before" },
                     type: "Punctuator"
                 },
                 {
-                    message: "A space is required after ','.",
+                    messageId: "missing",
+                    data: { loc: "after" },
                     type: "Punctuator"
                 }
             ]
@@ -403,15 +427,17 @@ ruleTester.run("comma-spacing", rule, {
         {
             code: "var foo = (a = 1,b) => {}",
             output: "var foo = (a = 1 , b) => {}",
-            parserOptions: { ecmaVersion: 6 },
             options: [{ before: true, after: true }],
+            parserOptions: { ecmaVersion: 6 },
             errors: [
                 {
-                    message: "A space is required before ','.",
+                    messageId: "missing",
+                    data: { loc: "before" },
                     type: "Punctuator"
                 },
                 {
-                    message: "A space is required after ','.",
+                    messageId: "missing",
+                    data: { loc: "after" },
                     type: "Punctuator"
                 }
             ]
@@ -419,15 +445,16 @@ ruleTester.run("comma-spacing", rule, {
         {
             code: "function foo(a = 1 ,b = 2) {}",
             output: "function foo(a = 1, b = 2) {}",
-            parserOptions: { ecmaVersion: 6 },
             options: [{ before: false, after: true }],
+            parserOptions: { ecmaVersion: 6 },
             errors: [
                 {
                     message: "There should be no space before ','.",
                     type: "Punctuator"
                 },
                 {
-                    message: "A space is required after ','.",
+                    messageId: "missing",
+                    data: { loc: "after" },
                     type: "Punctuator"
                 }
             ]
@@ -442,7 +469,8 @@ ruleTester.run("comma-spacing", rule, {
                     type: "Punctuator"
                 },
                 {
-                    message: "A space is required after ','.",
+                    messageId: "missing",
+                    data: { loc: "after" },
                     type: "Punctuator"
                 }
             ]
@@ -462,7 +490,8 @@ ruleTester.run("comma-spacing", rule, {
             output: "myfunc(404, true, /* bla bla bla */ 'hello');",
             errors: [
                 {
-                    message: "A space is required after ','.",
+                    messageId: "missing",
+                    data: { loc: "after" },
                     type: "Punctuator"
                 }
             ]
@@ -472,7 +501,8 @@ ruleTester.run("comma-spacing", rule, {
             output: "myfunc(404, // comment\n true, 'hello');",
             errors: [
                 {
-                    message: "A space is required after ','.",
+                    messageId: "missing",
+                    data: { loc: "after" },
                     type: "Punctuator"
                 }
             ]

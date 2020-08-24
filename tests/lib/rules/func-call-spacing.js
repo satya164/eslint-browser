@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 
 const rule = require("../../../lib/rules/func-call-spacing"),
-    RuleTester = require("../../../lib/testers/rule-tester");
+    { RuleTester } = require("../../../lib/rule-tester");
 
 //------------------------------------------------------------------------------
 // Tests
@@ -38,6 +38,10 @@ ruleTester.run("func-call-spacing", rule, {
         "f(0, (1))",
         "describe/**/('foo', function () {});",
         "new (foo())",
+        {
+            code: "import(source)",
+            parserOptions: { ecmaVersion: 2020 }
+        },
 
         // "never"
         {
@@ -104,6 +108,11 @@ ruleTester.run("func-call-spacing", rule, {
             code: "new (foo())",
             options: ["never"]
         },
+        {
+            code: "import(source)",
+            options: ["never"],
+            parserOptions: { ecmaVersion: 2020 }
+        },
 
         // "always"
         {
@@ -154,6 +163,11 @@ ruleTester.run("func-call-spacing", rule, {
             code: "f ();\n t   ();",
             options: ["always"]
         },
+        {
+            code: "import (source)",
+            options: ["always"],
+            parserOptions: { ecmaVersion: 2020 }
+        },
 
         // "always", "allowNewlines": true
         {
@@ -181,10 +195,6 @@ ruleTester.run("func-call-spacing", rule, {
             options: ["always", { allowNewlines: true }]
         },
         {
-            code: "f// comment\n()",
-            options: ["always", { allowNewlines: true }]
-        },
-        {
             code: "f\n/*\n*/\n()",
             options: ["always", { allowNewlines: true }]
         },
@@ -203,6 +213,33 @@ ruleTester.run("func-call-spacing", rule, {
         {
             code: "f\r\n();",
             options: ["always", { allowNewlines: true }]
+        },
+        {
+            code: "import\n(source)",
+            options: ["always", { allowNewlines: true }],
+            parserOptions: { ecmaVersion: 2020 }
+        },
+
+        // Optional chaining
+        {
+            code: "func?.()",
+            options: ["never"],
+            parserOptions: { ecmaVersion: 2020 }
+        },
+        {
+            code: "func ?.()",
+            options: ["always"],
+            parserOptions: { ecmaVersion: 2020 }
+        },
+        {
+            code: "func?. ()",
+            options: ["always"],
+            parserOptions: { ecmaVersion: 2020 }
+        },
+        {
+            code: "func ?. ()",
+            options: ["always"],
+            parserOptions: { ecmaVersion: 2020 }
         }
     ],
     invalid: [
@@ -210,172 +247,231 @@ ruleTester.run("func-call-spacing", rule, {
         // default ("never")
         {
             code: "f ();",
-            errors: [{ message: "Unexpected space between function name and paren.", type: "CallExpression" }],
-            output: "f();"
+            output: "f();",
+            errors: [{ messageId: "unexpectedWhitespace", type: "CallExpression" }]
         },
         {
             code: "f (a, b);",
-            errors: [{ message: "Unexpected space between function name and paren.", type: "CallExpression" }],
-            output: "f(a, b);"
+            output: "f(a, b);",
+            errors: [{ messageId: "unexpectedWhitespace", type: "CallExpression" }]
         },
         {
             code: "f.b ();",
-            errors: [{ message: "Unexpected space between function name and paren.", type: "CallExpression", column: 3 }],
-            output: "f.b();"
+            output: "f.b();",
+            errors: [
+                {
+                    messageId: "unexpectedWhitespace",
+                    type: "CallExpression",
+                    column: 4,
+                    line: 1,
+                    endColumn: 4,
+                    endLine: 1
+                }
+            ]
         },
         {
             code: "f.b().c ();",
-            errors: [{ message: "Unexpected space between function name and paren.", type: "CallExpression", column: 7 }],
-            output: "f.b().c();"
+            output: "f.b().c();",
+            errors: [
+                {
+                    messageId: "unexpectedWhitespace",
+                    type: "CallExpression",
+                    column: 8,
+                    line: 1,
+                    endColumn: 8,
+                    endLine: 1
+                }
+            ]
         },
         {
             code: "f() ()",
-            errors: [{ message: "Unexpected space between function name and paren.", type: "CallExpression" }],
-            output: "f()()"
+            output: "f()()",
+            errors: [{ messageId: "unexpectedWhitespace", type: "CallExpression" }]
         },
         {
             code: "(function() {} ())",
-            errors: [{ message: "Unexpected space between function name and paren.", type: "CallExpression" }],
-            output: "(function() {}())"
+            output: "(function() {}())",
+            errors: [{ messageId: "unexpectedWhitespace", type: "CallExpression" }]
         },
         {
             code: "var f = new Foo ()",
-            errors: [{ message: "Unexpected space between function name and paren.", type: "NewExpression" }],
-            output: "var f = new Foo()"
+            output: "var f = new Foo()",
+            errors: [{ messageId: "unexpectedWhitespace", type: "NewExpression" }]
         },
         {
             code: "f ( (0) )",
-            errors: [{ message: "Unexpected space between function name and paren.", type: "CallExpression" }],
-            output: "f( (0) )"
+            output: "f( (0) )",
+            errors: [{ messageId: "unexpectedWhitespace", type: "CallExpression" }]
         },
         {
             code: "f(0) (1)",
-            errors: [{ message: "Unexpected space between function name and paren.", type: "CallExpression" }],
-            output: "f(0)(1)"
+            output: "f(0)(1)",
+            errors: [{ messageId: "unexpectedWhitespace", type: "CallExpression" }]
         },
         {
             code: "(f) (0)",
-            errors: [{ message: "Unexpected space between function name and paren.", type: "CallExpression" }],
-            output: "(f)(0)"
+            output: "(f)(0)",
+            errors: [{ messageId: "unexpectedWhitespace", type: "CallExpression" }]
         },
         {
             code: "f ();\n t   ();",
+            output: "f();\n t();",
             errors: [
-                { message: "Unexpected space between function name and paren.", type: "CallExpression" },
-                { message: "Unexpected space between function name and paren.", type: "CallExpression" }
-            ],
-            output: "f();\n t();"
+                { messageId: "unexpectedWhitespace", type: "CallExpression" },
+                { messageId: "unexpectedWhitespace", type: "CallExpression" }
+            ]
+        },
+        {
+            code: "import (source);",
+            output: "import(source);",
+            parserOptions: { ecmaVersion: 2020 },
+            errors: [{ messageId: "unexpectedWhitespace", type: "ImportExpression" }]
         },
 
         // https://github.com/eslint/eslint/issues/7787
         {
             code: "f\n();",
-            errors: [{ message: "Unexpected space between function name and paren.", type: "CallExpression" }],
-            output: "f\n();" // no change
+            output: null, // no change
+            errors: [{ messageId: "unexpectedWhitespace", type: "CallExpression" }]
         },
         {
             code: "f\r();",
-            errors: [{ message: "Unexpected space between function name and paren.", type: "CallExpression" }],
-            output: "f\r();" // no change
+            output: null, // no change
+            errors: [{ messageId: "unexpectedWhitespace", type: "CallExpression" }]
         },
         {
             code: "f\u2028();",
-            errors: [{ message: "Unexpected space between function name and paren.", type: "CallExpression" }],
-            output: "f\u2028();" // no change
+            output: null, // no change
+            errors: [{ messageId: "unexpectedWhitespace", type: "CallExpression" }]
         },
         {
             code: "f\u2029();",
-            errors: [{ message: "Unexpected space between function name and paren.", type: "CallExpression" }],
-            output: "f\u2029();" // no change
+            output: null, // no change
+            errors: [{ messageId: "unexpectedWhitespace", type: "CallExpression" }]
         },
         {
             code: "f\r\n();",
-            errors: [{ message: "Unexpected space between function name and paren.", type: "CallExpression" }],
-            output: "f\r\n();" // no change
+            output: null, // no change
+            errors: [{ messageId: "unexpectedWhitespace", type: "CallExpression" }]
+        },
+        {
+            code: "import\n(source);",
+            output: null,
+            parserOptions: { ecmaVersion: 2020 },
+            errors: [{ messageId: "unexpectedWhitespace", type: "ImportExpression" }]
         },
 
         // "never"
         {
             code: "f ();",
+            output: "f();",
             options: ["never"],
-            errors: [{ message: "Unexpected space between function name and paren.", type: "CallExpression" }],
-            output: "f();"
+            errors: [{ messageId: "unexpectedWhitespace", type: "CallExpression" }]
         },
         {
             code: "f (a, b);",
+            output: "f(a, b);",
             options: ["never"],
-            errors: [{ message: "Unexpected space between function name and paren.", type: "CallExpression" }],
-            output: "f(a, b);"
+            errors: [{ messageId: "unexpectedWhitespace", type: "CallExpression" }]
         },
         {
-            code: "f.b ();",
+            code: "f.b  ();",
+            output: "f.b();",
             options: ["never"],
-            errors: [{ message: "Unexpected space between function name and paren.", type: "CallExpression", column: 3 }],
-            output: "f.b();"
+            errors: [
+                {
+                    messageId: "unexpectedWhitespace",
+                    type: "CallExpression",
+                    column: 4,
+                    line: 1,
+                    endColumn: 5,
+                    endLine: 1
+                }
+            ]
         },
         {
             code: "f.b().c ();",
+            output: "f.b().c();",
             options: ["never"],
-            errors: [{ message: "Unexpected space between function name and paren.", type: "CallExpression", column: 7 }],
-            output: "f.b().c();"
+            errors: [
+                {
+                    messageId: "unexpectedWhitespace",
+                    type: "CallExpression",
+                    column: 8,
+                    line: 1,
+                    endColumn: 8,
+                    endLine: 1
+                }
+            ]
         },
         {
             code: "f() ()",
+            output: "f()()",
             options: ["never"],
-            errors: [{ message: "Unexpected space between function name and paren.", type: "CallExpression" }],
-            output: "f()()"
+            errors: [{ messageId: "unexpectedWhitespace", type: "CallExpression" }]
         },
         {
             code: "(function() {} ())",
+            output: "(function() {}())",
             options: ["never"],
-            errors: [{ message: "Unexpected space between function name and paren.", type: "CallExpression" }],
-            output: "(function() {}())"
+            errors: [{ messageId: "unexpectedWhitespace", type: "CallExpression" }]
         },
         {
             code: "var f = new Foo ()",
+            output: "var f = new Foo()",
             options: ["never"],
-            errors: [{ message: "Unexpected space between function name and paren.", type: "NewExpression" }],
-            output: "var f = new Foo()"
+            errors: [{ messageId: "unexpectedWhitespace", type: "NewExpression" }]
         },
         {
             code: "f ( (0) )",
+            output: "f( (0) )",
             options: ["never"],
-            errors: [{ message: "Unexpected space between function name and paren.", type: "CallExpression" }],
-            output: "f( (0) )"
+            errors: [{ messageId: "unexpectedWhitespace", type: "CallExpression" }]
         },
         {
             code: "f(0) (1)",
+            output: "f(0)(1)",
             options: ["never"],
-            errors: [{ message: "Unexpected space between function name and paren.", type: "CallExpression" }],
-            output: "f(0)(1)"
+            errors: [{ messageId: "unexpectedWhitespace", type: "CallExpression" }]
         },
         {
             code: "(f) (0)",
+            output: "(f)(0)",
             options: ["never"],
-            errors: [{ message: "Unexpected space between function name and paren.", type: "CallExpression" }],
-            output: "(f)(0)"
+            errors: [{ messageId: "unexpectedWhitespace", type: "CallExpression" }]
         },
         {
             code: "f ();\n t   ();",
+            output: "f();\n t();",
             options: ["never"],
             errors: [
-                { message: "Unexpected space between function name and paren.", type: "CallExpression" },
-                { message: "Unexpected space between function name and paren.", type: "CallExpression" }
-            ],
-            output: "f();\n t();"
+                { messageId: "unexpectedWhitespace", type: "CallExpression" },
+                { messageId: "unexpectedWhitespace", type: "CallExpression" }
+            ]
+        },
+        {
+            code: "import (source);",
+            output: "import(source);",
+            options: ["never"],
+            parserOptions: { ecmaVersion: 2020 },
+            errors: [{ messageId: "unexpectedWhitespace", type: "ImportExpression" }]
         },
 
         // https://github.com/eslint/eslint/issues/7787
         {
             code: "f\n();",
+            output: null, // no change
             options: ["never"],
             errors: [
                 {
-                    message: "Unexpected space between function name and paren.",
-                    type: "CallExpression"
+                    messageId: "unexpectedWhitespace",
+                    type: "CallExpression",
+                    line: 1,
+                    column: 2,
+                    endLine: 2,
+                    endColumn: 0
                 }
-            ],
-            output: "f\n();" // no change
+            ]
         },
         {
             code: [
@@ -383,308 +479,492 @@ ruleTester.run("func-call-spacing", rule, {
                 "this.decrement(request)",
                 "(0, request.reject)(new api.Cancel())"
             ].join("\n"),
+            output: null, // no change
             options: ["never"],
             errors: [
                 {
-                    message: "Unexpected space between function name and paren.",
+                    messageId: "unexpectedWhitespace",
                     type: "CallExpression",
                     line: 2,
-                    column: 23
+                    column: 24,
+                    endLine: 3,
+                    endColumn: 0
                 }
-            ],
-            output: [
-                "this.cancelled.add(request)",
-                "this.decrement(request)",
-                "(0, request.reject)(new api.Cancel())"
-            ].join("\n") // no change
+            ]
         },
         {
             code: [
                 "var a = foo",
                 "(function(global) {}(this));"
             ].join("\n"),
+            output: null, // no change
             options: ["never"],
             errors: [
                 {
-                    message: "Unexpected space between function name and paren.",
+                    messageId: "unexpectedWhitespace",
                     type: "CallExpression",
                     line: 1,
-                    column: 9
+                    column: 12,
+                    endLine: 2,
+                    endColumn: 0
                 }
-            ],
-            output: [
-                "var a = foo",
-                "(function(global) {}(this));"
-            ].join("\n") // no change
+            ]
         },
         {
             code: [
                 "var a = foo",
                 "(0, baz())"
             ].join("\n"),
+            output: null, // no change
             options: ["never"],
             errors: [
                 {
-                    message: "Unexpected space between function name and paren.",
+                    messageId: "unexpectedWhitespace",
                     type: "CallExpression",
                     line: 1,
-                    column: 9
+                    column: 12,
+                    endColumn: 0,
+                    endLine: 2
                 }
-            ],
-            output: [
-                "var a = foo",
-                "(0, baz())"
-            ].join("\n") // no change
+            ]
         },
         {
             code: "f\r();",
+            output: null, // no change
             options: ["never"],
             errors: [
                 {
-                    message: "Unexpected space between function name and paren.",
+                    messageId: "unexpectedWhitespace",
                     type: "CallExpression"
                 }
-            ],
-            output: "f\r();" // no change
+            ]
         },
         {
             code: "f\u2028();",
+            output: null, // no change
             options: ["never"],
             errors: [
                 {
-                    message: "Unexpected space between function name and paren.",
+                    messageId: "unexpectedWhitespace",
                     type: "CallExpression"
                 }
-            ],
-            output: "f\u2028();" // no change
+            ]
         },
         {
             code: "f\u2029();",
+            output: null, // no change
             options: ["never"],
             errors: [
                 {
-                    message: "Unexpected space between function name and paren.",
+                    messageId: "unexpectedWhitespace",
                     type: "CallExpression"
                 }
-            ],
-            output: "f\u2029();" // no change
+            ]
         },
         {
             code: "f\r\n();",
+            output: null, // no change
             options: ["never"],
             errors: [
                 {
-                    message: "Unexpected space between function name and paren.",
+                    messageId: "unexpectedWhitespace",
                     type: "CallExpression"
                 }
-            ],
-            output: "f\r\n();" // no change
+            ]
         },
 
         // "always"
         {
             code: "f();",
+            output: "f ();",
             options: ["always"],
-            errors: [{ message: "Missing space between function name and paren.", type: "CallExpression" }],
-            output: "f ();"
+            errors: [{ messageId: "missing", type: "CallExpression" }]
         },
         {
             code: "f\n();",
+            output: null, // Don't fix to avoid hiding no-unexpected-multiline (https://github.com/eslint/eslint/issues/7787)
             options: ["always"],
-            errors: [{ message: "Unexpected newline between function name and paren.", type: "CallExpression" }],
-            output: "f ();"
+            errors: [{ messageId: "unexpectedNewline", type: "CallExpression" }]
         },
         {
             code: "f(a, b);",
+            output: "f (a, b);",
             options: ["always"],
-            errors: [{ message: "Missing space between function name and paren.", type: "CallExpression" }],
-            output: "f (a, b);"
+            errors: [{ messageId: "missing", type: "CallExpression" }]
         },
         {
             code: "f\n(a, b);",
+            output: null, // Don't fix to avoid hiding no-unexpected-multiline (https://github.com/eslint/eslint/issues/7787)
             options: ["always"],
-            errors: [{ message: "Unexpected newline between function name and paren.", type: "CallExpression" }],
-            output: "f (a, b);"
+            errors: [{ messageId: "unexpectedNewline", type: "CallExpression" }]
         },
         {
             code: "f.b();",
+            output: "f.b ();",
             options: ["always"],
-            errors: [{ message: "Missing space between function name and paren.", type: "CallExpression", column: 3 }],
-            output: "f.b ();"
+            errors: [
+                {
+                    messageId: "missing",
+                    type: "CallExpression",
+                    column: 3,
+                    line: 1,
+                    endLine: 1,
+                    endColumn: 4
+                }
+            ]
         },
         {
             code: "f.b\n();",
+            output: null, // Don't fix to avoid hiding no-unexpected-multiline (https://github.com/eslint/eslint/issues/7787)
             options: ["always"],
-            errors: [{ message: "Unexpected newline between function name and paren.", type: "CallExpression", column: 3 }],
-            output: "f.b ();"
+            errors: [
+                {
+                    messageId: "unexpectedNewline",
+                    type: "CallExpression",
+                    column: 4,
+                    line: 1,
+                    endColumn: 1,
+                    endLine: 2
+                }
+            ]
         },
         {
             code: "f.b().c ();",
+            output: "f.b ().c ();",
             options: ["always"],
-            errors: [{ message: "Missing space between function name and paren.", type: "CallExpression", column: 3 }],
-            output: "f.b ().c ();"
+            errors: [{ messageId: "missing", type: "CallExpression", column: 3 }]
         },
         {
             code: "f.b\n().c ();",
+            output: null, // Don't fix to avoid hiding no-unexpected-multiline (https://github.com/eslint/eslint/issues/7787)
             options: ["always"],
-            errors: [{ message: "Unexpected newline between function name and paren.", type: "CallExpression", column: 3 }],
-            output: "f.b ().c ();"
+            errors: [
+                {
+                    messageId: "unexpectedNewline",
+                    type: "CallExpression",
+                    column: 4,
+                    line: 1,
+                    endColumn: 1,
+                    endLine: 2
+                }
+            ]
         },
         {
             code: "f() ()",
+            output: "f () ()",
             options: ["always"],
-            errors: [{ message: "Missing space between function name and paren.", type: "CallExpression" }],
-            output: "f () ()"
+            errors: [{ messageId: "missing", type: "CallExpression" }]
         },
         {
             code: "f\n() ()",
+            output: null, // Don't fix to avoid hiding no-unexpected-multiline (https://github.com/eslint/eslint/issues/7787)
             options: ["always"],
-            errors: [{ message: "Unexpected newline between function name and paren.", type: "CallExpression" }],
-            output: "f () ()"
+            errors: [{ messageId: "unexpectedNewline", type: "CallExpression" }]
         },
         {
             code: "f\n()()",
+            output: "f\n() ()", // Don't fix the first error to avoid hiding no-unexpected-multiline (https://github.com/eslint/eslint/issues/7787)
             options: ["always"],
             errors: [
-                { message: "Unexpected newline between function name and paren.", type: "CallExpression" },
-                { message: "Missing space between function name and paren.", type: "CallExpression" }
-            ],
-            output: "f () ()"
+                { messageId: "unexpectedNewline", type: "CallExpression" },
+                { messageId: "missing", type: "CallExpression" }
+            ]
         },
         {
             code: "(function() {}())",
+            output: "(function() {} ())",
             options: ["always"],
-            errors: [{ message: "Missing space between function name and paren.", type: "CallExpression" }],
-            output: "(function() {} ())"
+            errors: [{ messageId: "missing", type: "CallExpression" }]
         },
         {
             code: "var f = new Foo()",
+            output: "var f = new Foo ()",
             options: ["always"],
-            errors: [{ message: "Missing space between function name and paren.", type: "NewExpression" }],
-            output: "var f = new Foo ()"
+            errors: [{ messageId: "missing", type: "NewExpression" }]
         },
         {
             code: "f( (0) )",
+            output: "f ( (0) )",
             options: ["always"],
-            errors: [{ message: "Missing space between function name and paren.", type: "CallExpression" }],
-            output: "f ( (0) )"
+            errors: [{ messageId: "missing", type: "CallExpression" }]
         },
         {
             code: "f(0) (1)",
+            output: "f (0) (1)",
             options: ["always"],
-            errors: [{ message: "Missing space between function name and paren.", type: "CallExpression" }],
-            output: "f (0) (1)"
+            errors: [{ messageId: "missing", type: "CallExpression" }]
         },
         {
             code: "(f)(0)",
+            output: "(f) (0)",
             options: ["always"],
-            errors: [{ message: "Missing space between function name and paren.", type: "CallExpression" }],
-            output: "(f) (0)"
+            errors: [{ messageId: "missing", type: "CallExpression" }]
+        },
+        {
+            code: "import(source);",
+            output: "import (source);",
+            options: ["always"],
+            parserOptions: { ecmaVersion: 2020 },
+            errors: [{ messageId: "missing", type: "ImportExpression" }]
         },
         {
             code: "f();\n t();",
+            output: "f ();\n t ();",
             options: ["always"],
             errors: [
-                { message: "Missing space between function name and paren.", type: "CallExpression" },
-                { message: "Missing space between function name and paren.", type: "CallExpression" }
-            ],
-            output: "f ();\n t ();"
+                { messageId: "missing", type: "CallExpression" },
+                { messageId: "missing", type: "CallExpression" }
+            ]
         },
         {
             code: "f\r();",
+            output: null, // Don't fix to avoid hiding no-unexpected-multiline (https://github.com/eslint/eslint/issues/7787)
             options: ["always"],
-            errors: [{ message: "Unexpected newline between function name and paren.", type: "CallExpression" }],
-            output: "f ();"
+            errors: [{ messageId: "unexpectedNewline", type: "CallExpression" }]
         },
         {
             code: "f\u2028();",
+            output: null, // Don't fix to avoid hiding no-unexpected-multiline (https://github.com/eslint/eslint/issues/7787)
             options: ["always"],
-            errors: [{ message: "Unexpected newline between function name and paren.", type: "CallExpression" }],
-            output: "f ();"
+            errors: [{ messageId: "unexpectedNewline", type: "CallExpression" }]
         },
         {
             code: "f\u2029();",
+            output: null, // Don't fix to avoid hiding no-unexpected-multiline (https://github.com/eslint/eslint/issues/7787)
             options: ["always"],
-            errors: [{ message: "Unexpected newline between function name and paren.", type: "CallExpression" }],
-            output: "f ();"
+            errors: [{ messageId: "unexpectedNewline", type: "CallExpression" }]
         },
         {
             code: "f\r\n();",
+            output: null, // Don't fix to avoid hiding no-unexpected-multiline (https://github.com/eslint/eslint/issues/7787)
             options: ["always"],
-            errors: [{ message: "Unexpected newline between function name and paren.", type: "CallExpression" }],
-            output: "f ();"
+            errors: [{ messageId: "unexpectedNewline", type: "CallExpression" }]
         },
 
         // "always", "allowNewlines": true
         {
             code: "f();",
+            output: "f ();",
             options: ["always", { allowNewlines: true }],
             errors: [
-                { message: "Missing space between function name and paren.", type: "CallExpression" }],
-            output: "f ();"
+                { messageId: "missing", type: "CallExpression" }]
         },
         {
             code: "f(a, b);",
+            output: "f (a, b);",
             options: ["always", { allowNewlines: true }],
-            errors: [{ message: "Missing space between function name and paren.", type: "CallExpression" }],
-            output: "f (a, b);"
+            errors: [{ messageId: "missing", type: "CallExpression" }]
         },
         {
             code: "f.b();",
+            output: "f.b ();",
             options: ["always", { allowNewlines: true }],
-            errors: [{ message: "Missing space between function name and paren.", type: "CallExpression", column: 3 }],
-            output: "f.b ();"
+            errors: [
+                {
+                    messageId: "missing",
+                    type: "CallExpression",
+                    column: 3
+                }
+            ]
         },
         {
             code: "f.b().c ();",
+            output: "f.b ().c ();",
             options: ["always", { allowNewlines: true }],
-            errors: [{ message: "Missing space between function name and paren.", type: "CallExpression", column: 3 }],
-            output: "f.b ().c ();"
+            errors: [{ messageId: "missing", type: "CallExpression", column: 3 }]
         },
         {
             code: "f() ()",
+            output: "f () ()",
             options: ["always", { allowNewlines: true }],
-            errors: [{ message: "Missing space between function name and paren.", type: "CallExpression" }],
-            output: "f () ()"
+            errors: [{ messageId: "missing", type: "CallExpression" }]
         },
         {
             code: "(function() {}())",
+            output: "(function() {} ())",
             options: ["always", { allowNewlines: true }],
-            errors: [{ message: "Missing space between function name and paren.", type: "CallExpression" }],
-            output: "(function() {} ())"
+            errors: [{ messageId: "missing", type: "CallExpression" }]
         },
         {
             code: "var f = new Foo()",
+            output: "var f = new Foo ()",
             options: ["always", { allowNewlines: true }],
-            errors: [{ message: "Missing space between function name and paren.", type: "NewExpression" }],
-            output: "var f = new Foo ()"
+            errors: [{ messageId: "missing", type: "NewExpression" }]
         },
         {
             code: "f( (0) )",
+            output: "f ( (0) )",
             options: ["always", { allowNewlines: true }],
-            errors: [{ message: "Missing space between function name and paren.", type: "CallExpression" }],
-            output: "f ( (0) )"
+            errors: [{ messageId: "missing", type: "CallExpression" }]
         },
         {
             code: "f(0) (1)",
+            output: "f (0) (1)",
             options: ["always", { allowNewlines: true }],
-            errors: [{ message: "Missing space between function name and paren.", type: "CallExpression" }],
-            output: "f (0) (1)"
+            errors: [{ messageId: "missing", type: "CallExpression" }]
         },
         {
             code: "(f)(0)",
+            output: "(f) (0)",
             options: ["always", { allowNewlines: true }],
-            errors: [{ message: "Missing space between function name and paren.", type: "CallExpression" }],
-            output: "(f) (0)"
+            errors: [{ messageId: "missing", type: "CallExpression" }]
         },
         {
             code: "f();\n t();",
+            output: "f ();\n t ();",
             options: ["always", { allowNewlines: true }],
             errors: [
-                { message: "Missing space between function name and paren.", type: "CallExpression" },
-                { message: "Missing space between function name and paren.", type: "CallExpression" }
-            ],
-            output: "f ();\n t ();"
+                { messageId: "missing", type: "CallExpression" },
+                { messageId: "missing", type: "CallExpression" }
+            ]
+        },
+        {
+            code: "f    ();",
+            output: "f();",
+            errors: [
+                {
+                    messageId: "unexpectedWhitespace",
+                    type: "CallExpression",
+                    line: 1,
+                    column: 2,
+                    endLine: 1,
+                    endColumn: 5
+                }
+            ]
+        },
+        {
+            code: "f\n ();",
+            output: null,
+            errors: [
+                {
+                    messageId: "unexpectedWhitespace",
+                    type: "CallExpression",
+                    line: 1,
+                    column: 2,
+                    endLine: 2,
+                    endColumn: 1
+                }
+            ]
+        },
+        {
+            code: "fn();",
+            output: "fn ();",
+            options: ["always"],
+            errors: [
+                {
+                    messageId: "missing",
+                    type: "CallExpression",
+                    line: 1,
+                    column: 2,
+                    endLine: 1,
+                    endColumn: 3
+                }
+            ]
+        },
+        {
+            code: "fnn\n (a, b);",
+            output: null, // Don't fix to avoid hiding no-unexpected-multiline (https://github.com/eslint/eslint/issues/7787)
+            options: ["always"],
+            errors: [
+                {
+                    messageId: "unexpectedNewline",
+                    type: "CallExpression",
+                    line: 1,
+                    column: 4,
+                    endLine: 2,
+                    endColumn: 2
+                }
+            ]
+        },
+        {
+            code: "f /*comment*/ ()",
+            output: null, // Don't remove comments
+            options: ["never"],
+            errors: [{ messageId: "unexpectedWhitespace" }]
+        },
+        {
+            code: "f /*\n*/ ()",
+            output: null, // Don't remove comments
+            options: ["never"],
+            errors: [{ messageId: "unexpectedWhitespace" }]
+        },
+        {
+            code: "f/*comment*/()",
+            output: "f/*comment*/ ()",
+            options: ["always"],
+            errors: [{ messageId: "missing" }]
+        },
+
+        // Optional chaining
+        {
+            code: "func ?.()",
+            output: "func?.()",
+            options: ["never"],
+            parserOptions: { ecmaVersion: 2020 },
+            errors: [{ messageId: "unexpectedWhitespace" }]
+        },
+        {
+            code: "func?. ()",
+            output: "func?.()",
+            options: ["never"],
+            parserOptions: { ecmaVersion: 2020 },
+            errors: [{ messageId: "unexpectedWhitespace" }]
+        },
+        {
+            code: "func ?. ()",
+            output: "func?.()",
+            options: ["never"],
+            parserOptions: { ecmaVersion: 2020 },
+            errors: [{ messageId: "unexpectedWhitespace" }]
+        },
+        {
+            code: "func\n?.()",
+            output: "func?.()",
+            options: ["never"],
+            parserOptions: { ecmaVersion: 2020 },
+            errors: [{ messageId: "unexpectedWhitespace" }]
+        },
+        {
+            code: "func\n//comment\n?.()",
+            output: null, // Don't remove comments
+            options: ["never"],
+            parserOptions: { ecmaVersion: 2020 },
+            errors: [{ messageId: "unexpectedWhitespace" }]
+        },
+        {
+            code: "func?.()",
+            output: null, // Not sure inserting a space into either before/after `?.`.
+            options: ["always"],
+            parserOptions: { ecmaVersion: 2020 },
+            errors: [{ messageId: "missing" }]
+        },
+        {
+            code: "func\n  ?.()",
+            output: "func ?.()",
+            options: ["always"],
+            parserOptions: { ecmaVersion: 2020 },
+            errors: [{ messageId: "unexpectedNewline" }]
+        },
+        {
+            code: "func?.\n  ()",
+            output: "func?. ()",
+            options: ["always"],
+            parserOptions: { ecmaVersion: 2020 },
+            errors: [{ messageId: "unexpectedNewline" }]
+        },
+        {
+            code: "func  ?.\n  ()",
+            output: "func ?. ()",
+            options: ["always"],
+            parserOptions: { ecmaVersion: 2020 },
+            errors: [{ messageId: "unexpectedNewline" }]
+        },
+        {
+            code: "func\n /*comment*/ ?.()",
+            output: null, // Don't remove comments
+            options: ["always"],
+            parserOptions: { ecmaVersion: 2020 },
+            errors: [{ messageId: "unexpectedNewline" }]
         }
     ]
 });

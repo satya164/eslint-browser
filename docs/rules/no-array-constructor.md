@@ -1,7 +1,7 @@
 # disallow `Array` constructors (no-array-constructor)
 
 Use of the `Array` constructor to construct a new array is generally
-discouraged in favour of array literal notation because of the single-argument
+discouraged in favor of array literal notation because of the single-argument
 pitfall and because the `Array` global may be redefined. The exception is when
 the Array constructor is used to intentionally create sparse arrays of a
 specified size by giving the constructor a single numeric argument.
@@ -16,10 +16,6 @@ Examples of **incorrect** code for this rule:
 /*eslint no-array-constructor: "error"*/
 
 Array(0, 1, 2)
-```
-
-```js
-/*eslint no-array-constructor: "error"*/
 
 new Array(0, 1, 2)
 ```
@@ -30,12 +26,10 @@ Examples of **correct** code for this rule:
 /*eslint no-array-constructor: "error"*/
 
 Array(500)
-```
-
-```js
-/*eslint no-array-constructor: "error"*/
 
 new Array(someOtherArray.length)
+
+[0, 1, 2]
 ```
 
 ## When Not To Use It

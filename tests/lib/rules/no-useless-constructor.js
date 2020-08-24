@@ -10,20 +10,19 @@
 //------------------------------------------------------------------------------
 
 const rule = require("../../../lib/rules/no-useless-constructor");
-const RuleTester = require("../../../lib/testers/rule-tester");
+const { RuleTester } = require("../../../lib/rule-tester");
 
 //------------------------------------------------------------------------------
 // Tests
 //------------------------------------------------------------------------------
 
 const ruleTester = new RuleTester({ parserOptions: { ecmaVersion: 6 } });
-const error = { message: "Useless constructor.", type: "MethodDefinition" };
+const error = { messageId: "noUselessConstructor", type: "MethodDefinition" };
 
 ruleTester.run("no-useless-constructor", rule, {
     valid: [
         "class A { }",
         "class A { constructor(){ doSomething(); } }",
-        "class A { constructor(){ super('foo'); } }",
         "class A extends B { constructor(){} }",
         "class A extends B { constructor(){ super('foo'); } }",
         "class A extends B { constructor(foo, bar){ super(foo, bar, 1); } }",

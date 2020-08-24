@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 
 const rule = require("../../../lib/rules/no-debugger"),
-    RuleTester = require("../../../lib/testers/rule-tester");
+    { RuleTester } = require("../../../lib/rule-tester");
 
 //------------------------------------------------------------------------------
 // Tests
@@ -23,6 +23,10 @@ ruleTester.run("no-debugger", rule, {
         "var test = { debugger: 1 }; test.debugger;"
     ],
     invalid: [
-        { code: "debugger", errors: [{ message: "Unexpected 'debugger' statement.", type: "DebuggerStatement" }] }
+        {
+            code: "if (foo) debugger",
+            output: null,
+            errors: [{ messageId: "unexpected", type: "DebuggerStatement" }]
+        }
     ]
 });

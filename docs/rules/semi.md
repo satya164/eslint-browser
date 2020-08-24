@@ -1,6 +1,6 @@
 # require or disallow semicolons instead of ASI (semi)
 
-JavaScript is unique amongst the C-like languages in that it doesn't require semicolons at the end of each statement. In many cases, the JavaScript engine can determine that a semicolon should be in a certain spot and will automatically add it. This feature is known as **automatic semicolon insertion (ASI)** and is considered one of the more controversial features of JavaScript. For example, the following lines are both valid:
+JavaScript doesn't require semicolons at the end of each statement. In many cases, the JavaScript engine can determine that a semicolon should be in a certain spot and will automatically add it. This feature is known as **automatic semicolon insertion (ASI)** and is considered one of the more controversial features of JavaScript. For example, the following lines are both valid:
 
 ```js
 var name = "ESLint"
@@ -31,7 +31,7 @@ return;
 
 Effectively, a semicolon is inserted after the `return` statement, causing the code below it (a labeled literal inside a block) to be unreachable. This rule and the [no-unreachable](no-unreachable.md) rule will protect your code from such cases.
 
-On the other side of the argument are those who says that since semicolons are inserted automatically, they are optional and do not need to be inserted manually. However, the ASI mechanism can also be tricky to people who don't use semicolons. For example, consider this code:
+On the other side of the argument are those who say that since semicolons are inserted automatically, they are optional and do not need to be inserted manually. However, the ASI mechanism can also be tricky to people who don't use semicolons. For example, consider this code:
 
 ```js
 var globalCounter = { }
@@ -66,9 +66,15 @@ String option:
 * `"always"` (default) requires semicolons at the end of statements
 * `"never"` disallows semicolons as the end of statements (except to disambiguate statements beginning with `[`, `(`, `/`, `+`, or `-`)
 
-Object option:
+Object option (when `"always"`):
 
 * `"omitLastInOneLineBlock": true` ignores the last semicolon in a block in which its braces (and therefore the content of the block) are in the same line
+
+Object option (when `"never"`):
+
+* `"beforeStatementContinuationChars": "any"` (default) ignores semicolons (or lacking semicolon) at the end of statements if the next line starts with `[`, `(`, `/`, `+`, or `-`.
+* `"beforeStatementContinuationChars": "always"` requires semicolons at the end of statements if the next line starts with `[`, `(`, `/`, `+`, or `-`.
+* `"beforeStatementContinuationChars": "never"` disallows semicolons as the end of statements if it doesn't make ASI hazard even if the next line starts with `[`, `(`, `/`, `+`, or `-`.
 
 ### always
 
@@ -126,6 +132,16 @@ var name = "ESLint"
 ;(function() {
     // ...
 })()
+
+import a from "a"
+(function() {
+    // ...
+})()
+
+import b from "b"
+;(function() {
+    // ...
+})()
 ```
 
 #### omitLastInOneLineBlock
@@ -138,6 +154,30 @@ Examples of additional **correct** code for this rule with the `"always", { "omi
 if (foo) { bar() }
 
 if (foo) { bar(); baz() }
+```
+
+#### beforeStatementContinuationChars
+
+Examples of additional **incorrect** code for this rule with the `"never", { "beforeStatementContinuationChars": "always" }` options:
+
+```js
+/*eslint semi: ["error", "never", { "beforeStatementContinuationChars": "always"}] */
+import a from "a"
+
+(function() {
+    // ...
+})()
+```
+
+Examples of additional **incorrect** code for this rule with the `"never", { "beforeStatementContinuationChars": "never" }` options:
+
+```js
+/*eslint semi: ["error", "never", { "beforeStatementContinuationChars": "never"}] */
+import a from "a"
+
+;(function() {
+    // ...
+})()
 ```
 
 ## When Not To Use It

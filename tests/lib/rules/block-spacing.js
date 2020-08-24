@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 
 const rule = require("../../../lib/rules/block-spacing");
-const RuleTester = require("../../../lib/testers/rule-tester");
+const { RuleTester } = require("../../../lib/rule-tester");
 
 //------------------------------------------------------------------------------
 // Tests
@@ -23,25 +23,25 @@ ruleTester.run("block-spacing", rule, {
 
         // default/always
         { code: "{ foo(); }", options: ["always"] },
-        { code: "{ foo(); }" },
-        { code: "{ foo();\n}" },
-        { code: "{\nfoo(); }" },
-        { code: "{\r\nfoo();\r\n}" },
-        { code: "if (a) { foo(); }" },
-        { code: "if (a) {} else { foo(); }" },
-        { code: "switch (a) {}" },
-        { code: "switch (a) { case 0: foo(); }" },
-        { code: "while (a) { foo(); }" },
-        { code: "do { foo(); } while (a);" },
-        { code: "for (;;) { foo(); }" },
-        { code: "for (var a in b) { foo(); }" },
+        "{ foo(); }",
+        "{ foo();\n}",
+        "{\nfoo(); }",
+        "{\r\nfoo();\r\n}",
+        "if (a) { foo(); }",
+        "if (a) {} else { foo(); }",
+        "switch (a) {}",
+        "switch (a) { case 0: foo(); }",
+        "while (a) { foo(); }",
+        "do { foo(); } while (a);",
+        "for (;;) { foo(); }",
+        "for (var a in b) { foo(); }",
         { code: "for (var a of b) { foo(); }", parserOptions: { ecmaVersion: 6 } },
-        { code: "try { foo(); } catch (e) { foo(); }" },
-        { code: "function foo() { bar(); }" },
-        { code: "(function() { bar(); });" },
+        "try { foo(); } catch (e) { foo(); }",
+        "function foo() { bar(); }",
+        "(function() { bar(); });",
         { code: "(() => { bar(); });", parserOptions: { ecmaVersion: 6 } },
-        { code: "if (a) { /* comment */ foo(); /* comment */ }" },
-        { code: "if (a) { //comment\n foo(); }" },
+        "if (a) { /* comment */ foo(); /* comment */ }",
+        "if (a) { //comment\n foo(); }",
 
         // never
         { code: "{foo();}", options: ["never"] },
@@ -56,11 +56,11 @@ ruleTester.run("block-spacing", rule, {
         { code: "do {foo();} while (a);", options: ["never"] },
         { code: "for (;;) {foo();}", options: ["never"] },
         { code: "for (var a in b) {foo();}", options: ["never"] },
-        { code: "for (var a of b) {foo();}", parserOptions: { ecmaVersion: 6 }, options: ["never"] },
+        { code: "for (var a of b) {foo();}", options: ["never"], parserOptions: { ecmaVersion: 6 } },
         { code: "try {foo();} catch (e) {foo();}", options: ["never"] },
         { code: "function foo() {bar();}", options: ["never"] },
         { code: "(function() {bar();});", options: ["never"] },
-        { code: "(() => {bar();});", parserOptions: { ecmaVersion: 6 }, options: ["never"] },
+        { code: "(() => {bar();});", options: ["never"], parserOptions: { ecmaVersion: 6 } },
         { code: "if (a) {/* comment */ foo(); /* comment */}", options: ["never"] },
         { code: "if (a) { //comment\n foo();}", options: ["never"] }
     ],
@@ -73,100 +73,100 @@ ruleTester.run("block-spacing", rule, {
             output: "{ foo(); }",
             options: ["always"],
             errors: [
-                { type: "BlockStatement", line: 1, column: 1, message: "Requires a space after '{'." },
-                { type: "BlockStatement", line: 1, column: 8, message: "Requires a space before '}'." }
+                { type: "BlockStatement", line: 1, column: 1, messageId: "missing", data: { location: "after", token: "{" } },
+                { type: "BlockStatement", line: 1, column: 8, messageId: "missing", data: { location: "before", token: "}" } }
             ]
         },
         {
             code: "{foo();}",
             output: "{ foo(); }",
             errors: [
-                { type: "BlockStatement", line: 1, column: 1, message: "Requires a space after '{'." },
-                { type: "BlockStatement", line: 1, column: 8, message: "Requires a space before '}'." }
+                { type: "BlockStatement", line: 1, column: 1, messageId: "missing", data: { location: "after", token: "{" } },
+                { type: "BlockStatement", line: 1, column: 8, messageId: "missing", data: { location: "before", token: "}" } }
             ]
         },
         {
             code: "{ foo();}",
             output: "{ foo(); }",
             errors: [
-                { type: "BlockStatement", line: 1, column: 9, message: "Requires a space before '}'." }
+                { type: "BlockStatement", line: 1, column: 9, messageId: "missing", data: { location: "before", token: "}" } }
             ]
         },
         {
             code: "{foo(); }",
             output: "{ foo(); }",
             errors: [
-                { type: "BlockStatement", line: 1, column: 1, message: "Requires a space after '{'." }
+                { type: "BlockStatement", line: 1, column: 1, messageId: "missing", data: { location: "after", token: "{" } }
             ]
         },
         {
             code: "{\nfoo();}",
             output: "{\nfoo(); }",
             errors: [
-                { type: "BlockStatement", line: 2, column: 7, message: "Requires a space before '}'." }
+                { type: "BlockStatement", line: 2, column: 7, messageId: "missing", data: { location: "before", token: "}" } }
             ]
         },
         {
             code: "{foo();\n}",
             output: "{ foo();\n}",
             errors: [
-                { type: "BlockStatement", line: 1, column: 1, message: "Requires a space after '{'." }
+                { type: "BlockStatement", line: 1, column: 1, messageId: "missing", data: { location: "after", token: "{" } }
             ]
         },
         {
             code: "if (a) {foo();}",
             output: "if (a) { foo(); }",
             errors: [
-                { type: "BlockStatement", line: 1, column: 8, message: "Requires a space after '{'." },
-                { type: "BlockStatement", line: 1, column: 15, message: "Requires a space before '}'." }
+                { type: "BlockStatement", line: 1, column: 8, messageId: "missing", data: { location: "after", token: "{" } },
+                { type: "BlockStatement", line: 1, column: 15, messageId: "missing", data: { location: "before", token: "}" } }
             ]
         },
         {
             code: "if (a) {} else {foo();}",
             output: "if (a) {} else { foo(); }",
             errors: [
-                { type: "BlockStatement", line: 1, column: 16, message: "Requires a space after '{'." },
-                { type: "BlockStatement", line: 1, column: 23, message: "Requires a space before '}'." }
+                { type: "BlockStatement", line: 1, column: 16, messageId: "missing", data: { location: "after", token: "{" } },
+                { type: "BlockStatement", line: 1, column: 23, messageId: "missing", data: { location: "before", token: "}" } }
             ]
         },
         {
             code: "switch (a) {case 0: foo();}",
             output: "switch (a) { case 0: foo(); }",
             errors: [
-                { type: "SwitchStatement", line: 1, column: 12, message: "Requires a space after '{'." },
-                { type: "SwitchStatement", line: 1, column: 27, message: "Requires a space before '}'." }
+                { type: "SwitchStatement", line: 1, column: 12, messageId: "missing", data: { location: "after", token: "{" } },
+                { type: "SwitchStatement", line: 1, column: 27, messageId: "missing", data: { location: "before", token: "}" } }
             ]
         },
         {
             code: "while (a) {foo();}",
             output: "while (a) { foo(); }",
             errors: [
-                { type: "BlockStatement", line: 1, column: 11, message: "Requires a space after '{'." },
-                { type: "BlockStatement", line: 1, column: 18, message: "Requires a space before '}'." }
+                { type: "BlockStatement", line: 1, column: 11, messageId: "missing", data: { location: "after", token: "{" } },
+                { type: "BlockStatement", line: 1, column: 18, messageId: "missing", data: { location: "before", token: "}" } }
             ]
         },
         {
             code: "do {foo();} while (a);",
             output: "do { foo(); } while (a);",
             errors: [
-                { type: "BlockStatement", line: 1, column: 4, message: "Requires a space after '{'." },
-                { type: "BlockStatement", line: 1, column: 11, message: "Requires a space before '}'." }
+                { type: "BlockStatement", line: 1, column: 4, messageId: "missing", data: { location: "after", token: "{" } },
+                { type: "BlockStatement", line: 1, column: 11, messageId: "missing", data: { location: "before", token: "}" } }
             ]
         },
         {
             code: "for (;;) {foo();}",
             output: "for (;;) { foo(); }",
             errors: [
-                { type: "BlockStatement", line: 1, column: 10, message: "Requires a space after '{'." },
-                { type: "BlockStatement", line: 1, column: 17, message: "Requires a space before '}'." }
+                { type: "BlockStatement", line: 1, column: 10, messageId: "missing", data: { location: "after", token: "{" } },
+                { type: "BlockStatement", line: 1, column: 17, messageId: "missing", data: { location: "before", token: "}" } }
             ]
         },
         {
             code: "for (var a in b) {foo();}",
             output: "for (var a in b) { foo(); }",
             errors: [
-                { type: "BlockStatement", line: 1, column: 18, message: "Requires a space after '{'." },
-                { type: "BlockStatement", line: 1, column: 25, message: "Requires a space before '}'." }
+                { type: "BlockStatement", line: 1, column: 18, messageId: "missing", data: { location: "after", token: "{" } },
+                { type: "BlockStatement", line: 1, column: 25, messageId: "missing", data: { location: "before", token: "}" } }
             ]
         },
         {
@@ -174,36 +174,84 @@ ruleTester.run("block-spacing", rule, {
             output: "for (var a of b) { foo(); }",
             parserOptions: { ecmaVersion: 6 },
             errors: [
-                { type: "BlockStatement", line: 1, column: 18, message: "Requires a space after '{'." },
-                { type: "BlockStatement", line: 1, column: 25, message: "Requires a space before '}'." }
+                { type: "BlockStatement", line: 1, column: 18, messageId: "missing", data: { location: "after", token: "{" } },
+                { type: "BlockStatement", line: 1, column: 25, messageId: "missing", data: { location: "before", token: "}" } }
             ]
         },
         {
             code: "try {foo();} catch (e) {foo();} finally {foo();}",
             output: "try { foo(); } catch (e) { foo(); } finally { foo(); }",
             errors: [
-                { type: "BlockStatement", line: 1, column: 5, message: "Requires a space after '{'." },
-                { type: "BlockStatement", line: 1, column: 12, message: "Requires a space before '}'." },
-                { type: "BlockStatement", line: 1, column: 24, message: "Requires a space after '{'." },
-                { type: "BlockStatement", line: 1, column: 31, message: "Requires a space before '}'." },
-                { type: "BlockStatement", line: 1, column: 41, message: "Requires a space after '{'." },
-                { type: "BlockStatement", line: 1, column: 48, message: "Requires a space before '}'." }
+                {
+                    type: "BlockStatement",
+                    messageId: "missing",
+                    data: { location: "after", token: "{" },
+                    line: 1,
+                    column: 5,
+                    endLine: 1,
+                    endColumn: 6
+                },
+                {
+                    type: "BlockStatement",
+                    messageId: "missing",
+                    data: { location: "before", token: "}" },
+                    line: 1,
+                    column: 12,
+                    endLine: 1,
+                    endColumn: 13
+                },
+                {
+                    type: "BlockStatement",
+                    messageId: "missing",
+                    data: { location: "after", token: "{" },
+                    line: 1,
+                    column: 24,
+                    endLine: 1,
+                    endColumn: 25
+                },
+                {
+                    type: "BlockStatement",
+                    messageId: "missing",
+                    data: { location: "before", token: "}" },
+                    line: 1,
+                    column: 31,
+                    endLine: 1,
+                    endColumn: 32
+                },
+                {
+                    type: "BlockStatement",
+                    messageId: "missing",
+                    data: { location: "after", token: "{" },
+                    line: 1,
+                    column: 41,
+                    endLine: 1,
+                    endColumn: 42
+                },
+                {
+                    type: "BlockStatement",
+                    messageId: "missing",
+                    data: { location: "before", token: "}" },
+                    line: 1,
+                    column: 48,
+                    endLine: 1,
+                    endColumn: 49
+                }
             ]
         },
         {
             code: "function foo() {bar();}",
             output: "function foo() { bar(); }",
             errors: [
-                { type: "BlockStatement", line: 1, column: 16, message: "Requires a space after '{'." },
-                { type: "BlockStatement", line: 1, column: 23, message: "Requires a space before '}'." }
+                { type: "BlockStatement", line: 1, column: 16, messageId: "missing", data: { location: "after", token: "{" } },
+                { type: "BlockStatement", line: 1, column: 23, messageId: "missing", data: { location: "before", token: "}" } }
             ]
         },
         {
             code: "(function() {bar();});",
             output: "(function() { bar(); });",
             errors: [
-                { type: "BlockStatement", line: 1, column: 13, message: "Requires a space after '{'." },
-                { type: "BlockStatement", line: 1, column: 20, message: "Requires a space before '}'." }
+                { type: "BlockStatement", line: 1, column: 13, messageId: "missing", data: { location: "after", token: "{" } },
+                { type: "BlockStatement", line: 1, column: 20, messageId: "missing", data: { location: "before", token: "}" } }
             ]
         },
         {
@@ -211,8 +259,8 @@ ruleTester.run("block-spacing", rule, {
             output: "(() => { bar(); });",
             parserOptions: { ecmaVersion: 6 },
             errors: [
-                { type: "BlockStatement", line: 1, column: 8, message: "Requires a space after '{'." },
-                { type: "BlockStatement", line: 1, column: 15, message: "Requires a space before '}'." }
+                { type: "BlockStatement", line: 1, column: 8, messageId: "missing", data: { location: "after", token: "{" } },
+                { type: "BlockStatement", line: 1, column: 15, messageId: "missing", data: { location: "before", token: "}" } }
             ]
         },
         {
@@ -220,8 +268,8 @@ ruleTester.run("block-spacing", rule, {
             output: "if (a) { /* comment */ foo(); /* comment */ }",
             parserOptions: { ecmaVersion: 6 },
             errors: [
-                { type: "BlockStatement", line: 1, column: 8, message: "Requires a space after '{'." },
-                { type: "BlockStatement", line: 1, column: 43, message: "Requires a space before '}'." }
+                { type: "BlockStatement", line: 1, column: 8, messageId: "missing", data: { location: "after", token: "{" } },
+                { type: "BlockStatement", line: 1, column: 43, messageId: "missing", data: { location: "before", token: "}" } }
             ]
         },
         {
@@ -229,7 +277,18 @@ ruleTester.run("block-spacing", rule, {
             output: "if (a) { //comment\n foo(); }",
             parserOptions: { ecmaVersion: 6 },
             errors: [
-                { type: "BlockStatement", line: 1, column: 8, message: "Requires a space after '{'." }
+                {
+                    type: "BlockStatement",
+                    messageId: "missing",
+                    data: {
+                        location: "after",
+                        token: "{"
+                    },
+                    line: 1,
+                    column: 8,
+                    endLine: 1,
+                    endColumn: 9
+                }
             ]
         },
 
@@ -240,8 +299,24 @@ ruleTester.run("block-spacing", rule, {
             output: "{foo();}",
             options: ["never"],
             errors: [
-                { type: "BlockStatement", line: 1, column: 1, message: "Unexpected space(s) after '{'." },
-                { type: "BlockStatement", line: 1, column: 10, message: "Unexpected space(s) before '}'." }
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "after", token: "{" },
+                    line: 1,
+                    column: 2,
+                    endLine: 1,
+                    endColumn: 3
+                },
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "before", token: "}" },
+                    line: 1,
+                    column: 9,
+                    endLine: 1,
+                    endColumn: 10
+                }
             ]
         },
         {
@@ -249,7 +324,18 @@ ruleTester.run("block-spacing", rule, {
             output: "{foo();}",
             options: ["never"],
             errors: [
-                { type: "BlockStatement", line: 1, column: 1, message: "Unexpected space(s) after '{'." }
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: {
+                        location: "after",
+                        token: "{"
+                    },
+                    line: 1,
+                    column: 2,
+                    endLine: 1,
+                    endColumn: 3
+                }
             ]
         },
         {
@@ -257,7 +343,18 @@ ruleTester.run("block-spacing", rule, {
             output: "{foo();}",
             options: ["never"],
             errors: [
-                { type: "BlockStatement", line: 1, column: 9, message: "Unexpected space(s) before '}'." }
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: {
+                        location: "before",
+                        token: "}"
+                    },
+                    line: 1,
+                    column: 8,
+                    endLine: 1,
+                    endColumn: 9
+                }
             ]
         },
         {
@@ -265,7 +362,18 @@ ruleTester.run("block-spacing", rule, {
             output: "{\nfoo();}",
             options: ["never"],
             errors: [
-                { type: "BlockStatement", line: 2, column: 8, message: "Unexpected space(s) before '}'." }
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: {
+                        location: "before",
+                        token: "}"
+                    },
+                    line: 2,
+                    column: 7,
+                    endLine: 2,
+                    endColumn: 8
+                }
             ]
         },
         {
@@ -273,7 +381,18 @@ ruleTester.run("block-spacing", rule, {
             output: "{foo();\n}",
             options: ["never"],
             errors: [
-                { type: "BlockStatement", line: 1, column: 1, message: "Unexpected space(s) after '{'." }
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: {
+                        location: "after",
+                        token: "{"
+                    },
+                    line: 1,
+                    column: 2,
+                    endLine: 1,
+                    endColumn: 3
+                }
             ]
         },
         {
@@ -281,8 +400,24 @@ ruleTester.run("block-spacing", rule, {
             output: "if (a) {foo();}",
             options: ["never"],
             errors: [
-                { type: "BlockStatement", line: 1, column: 8, message: "Unexpected space(s) after '{'." },
-                { type: "BlockStatement", line: 1, column: 17, message: "Unexpected space(s) before '}'." }
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "after", token: "{" },
+                    line: 1,
+                    column: 9,
+                    endLine: 1,
+                    endColumn: 10
+                },
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "before", token: "}" },
+                    line: 1,
+                    column: 16,
+                    endLine: 1,
+                    endColumn: 17
+                }
             ]
         },
         {
@@ -290,8 +425,24 @@ ruleTester.run("block-spacing", rule, {
             output: "if (a) {} else {foo();}",
             options: ["never"],
             errors: [
-                { type: "BlockStatement", line: 1, column: 16, message: "Unexpected space(s) after '{'." },
-                { type: "BlockStatement", line: 1, column: 25, message: "Unexpected space(s) before '}'." }
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "after", token: "{" },
+                    line: 1,
+                    column: 17,
+                    endLine: 1,
+                    endColumn: 18
+                },
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "before", token: "}" },
+                    line: 1,
+                    column: 24,
+                    endLine: 1,
+                    endColumn: 25
+                }
             ]
         },
         {
@@ -299,8 +450,24 @@ ruleTester.run("block-spacing", rule, {
             output: "switch (a) {case 0: foo();}",
             options: ["never"],
             errors: [
-                { type: "SwitchStatement", line: 1, column: 12, message: "Unexpected space(s) after '{'." },
-                { type: "SwitchStatement", line: 1, column: 29, message: "Unexpected space(s) before '}'." }
+                {
+                    type: "SwitchStatement",
+                    messageId: "extra",
+                    data: { location: "after", token: "{" },
+                    line: 1,
+                    column: 13,
+                    endLine: 1,
+                    endColumn: 14
+                },
+                {
+                    type: "SwitchStatement",
+                    messageId: "extra",
+                    data: { location: "before", token: "}" },
+                    line: 1,
+                    column: 28,
+                    endLine: 1,
+                    endColumn: 29
+                }
             ]
         },
         {
@@ -308,8 +475,24 @@ ruleTester.run("block-spacing", rule, {
             output: "while (a) {foo();}",
             options: ["never"],
             errors: [
-                { type: "BlockStatement", line: 1, column: 11, message: "Unexpected space(s) after '{'." },
-                { type: "BlockStatement", line: 1, column: 20, message: "Unexpected space(s) before '}'." }
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "after", token: "{" },
+                    line: 1,
+                    column: 12,
+                    endLine: 1,
+                    endColumn: 13
+                },
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "before", token: "}" },
+                    line: 1,
+                    column: 19,
+                    endLine: 1,
+                    endColumn: 20
+                }
             ]
         },
         {
@@ -317,8 +500,24 @@ ruleTester.run("block-spacing", rule, {
             output: "do {foo();} while (a);",
             options: ["never"],
             errors: [
-                { type: "BlockStatement", line: 1, column: 4, message: "Unexpected space(s) after '{'." },
-                { type: "BlockStatement", line: 1, column: 13, message: "Unexpected space(s) before '}'." }
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "after", token: "{" },
+                    line: 1,
+                    column: 5,
+                    endLine: 1,
+                    endColumn: 6
+                },
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "before", token: "}" },
+                    line: 1,
+                    column: 12,
+                    endLine: 1,
+                    endColumn: 13
+                }
             ]
         },
         {
@@ -326,8 +525,24 @@ ruleTester.run("block-spacing", rule, {
             output: "for (;;) {foo();}",
             options: ["never"],
             errors: [
-                { type: "BlockStatement", line: 1, column: 10, message: "Unexpected space(s) after '{'." },
-                { type: "BlockStatement", line: 1, column: 19, message: "Unexpected space(s) before '}'." }
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "after", token: "{" },
+                    line: 1,
+                    column: 11,
+                    endLine: 1,
+                    endColumn: 12
+                },
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "before", token: "}" },
+                    line: 1,
+                    column: 18,
+                    endLine: 1,
+                    endColumn: 19
+                }
             ]
         },
         {
@@ -335,8 +550,24 @@ ruleTester.run("block-spacing", rule, {
             output: "for (var a in b) {foo();}",
             options: ["never"],
             errors: [
-                { type: "BlockStatement", line: 1, column: 18, message: "Unexpected space(s) after '{'." },
-                { type: "BlockStatement", line: 1, column: 27, message: "Unexpected space(s) before '}'." }
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "after", token: "{" },
+                    line: 1,
+                    column: 19,
+                    endLine: 1,
+                    endColumn: 20
+                },
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "before", token: "}" },
+                    line: 1,
+                    column: 26,
+                    endLine: 1,
+                    endColumn: 27
+                }
             ]
         },
         {
@@ -345,8 +576,24 @@ ruleTester.run("block-spacing", rule, {
             options: ["never"],
             parserOptions: { ecmaVersion: 6 },
             errors: [
-                { type: "BlockStatement", line: 1, column: 18, message: "Unexpected space(s) after '{'." },
-                { type: "BlockStatement", line: 1, column: 27, message: "Unexpected space(s) before '}'." }
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "after", token: "{" },
+                    line: 1,
+                    column: 19,
+                    endLine: 1,
+                    endColumn: 20
+                },
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "before", token: "}" },
+                    line: 1,
+                    column: 26,
+                    endLine: 1,
+                    endColumn: 27
+                }
             ]
         },
         {
@@ -354,12 +601,60 @@ ruleTester.run("block-spacing", rule, {
             output: "try {foo();} catch (e) {foo();} finally {foo();}",
             options: ["never"],
             errors: [
-                { type: "BlockStatement", line: 1, column: 5, message: "Unexpected space(s) after '{'." },
-                { type: "BlockStatement", line: 1, column: 14, message: "Unexpected space(s) before '}'." },
-                { type: "BlockStatement", line: 1, column: 26, message: "Unexpected space(s) after '{'." },
-                { type: "BlockStatement", line: 1, column: 35, message: "Unexpected space(s) before '}'." },
-                { type: "BlockStatement", line: 1, column: 45, message: "Unexpected space(s) after '{'." },
-                { type: "BlockStatement", line: 1, column: 54, message: "Unexpected space(s) before '}'." }
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "after", token: "{" },
+                    line: 1,
+                    column: 6,
+                    endLine: 1,
+                    endColumn: 7
+                },
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "before", token: "}" },
+                    line: 1,
+                    column: 13,
+                    endLine: 1,
+                    endColumn: 14
+                },
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "after", token: "{" },
+                    line: 1,
+                    column: 27,
+                    endLine: 1,
+                    endColumn: 28
+                },
+                {
+                    type: "BlockStatement",
+                    line: 1,
+                    column: 34,
+                    messageId: "extra",
+                    data: { location: "before", token: "}" },
+                    endLine: 1,
+                    endColumn: 35
+                },
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "after", token: "{" },
+                    line: 1,
+                    column: 46,
+                    endLine: 1,
+                    endColumn: 47
+                },
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "before", token: "}" },
+                    line: 1,
+                    column: 53,
+                    endLine: 1,
+                    endColumn: 54
+                }
             ]
         },
         {
@@ -367,8 +662,24 @@ ruleTester.run("block-spacing", rule, {
             output: "function foo() {bar();}",
             options: ["never"],
             errors: [
-                { type: "BlockStatement", line: 1, column: 16, message: "Unexpected space(s) after '{'." },
-                { type: "BlockStatement", line: 1, column: 25, message: "Unexpected space(s) before '}'." }
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "after", token: "{" },
+                    line: 1,
+                    column: 17,
+                    endLine: 1,
+                    endColumn: 18
+                },
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "before", token: "}" },
+                    line: 1,
+                    column: 24,
+                    endLine: 1,
+                    endColumn: 25
+                }
             ]
         },
         {
@@ -376,18 +687,50 @@ ruleTester.run("block-spacing", rule, {
             output: "(function() {bar();});",
             options: ["never"],
             errors: [
-                { type: "BlockStatement", line: 1, column: 13, message: "Unexpected space(s) after '{'." },
-                { type: "BlockStatement", line: 1, column: 22, message: "Unexpected space(s) before '}'." }
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "after", token: "{" },
+                    line: 1,
+                    column: 14,
+                    endLine: 1,
+                    endColumn: 15
+                },
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "before", token: "}" },
+                    line: 1,
+                    column: 21,
+                    endLine: 1,
+                    endColumn: 22
+                }
             ]
         },
         {
             code: "(() => { bar(); });",
             output: "(() => {bar();});",
-            parserOptions: { ecmaVersion: 6 },
             options: ["never"],
+            parserOptions: { ecmaVersion: 6 },
             errors: [
-                { type: "BlockStatement", line: 1, column: 8, message: "Unexpected space(s) after '{'." },
-                { type: "BlockStatement", line: 1, column: 17, message: "Unexpected space(s) before '}'." }
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "after", token: "{" },
+                    line: 1,
+                    column: 9,
+                    endLine: 1,
+                    endColumn: 10
+                },
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "before", token: "}" },
+                    line: 1,
+                    column: 16,
+                    endLine: 1,
+                    endColumn: 17
+                }
             ]
         },
         {
@@ -395,8 +738,84 @@ ruleTester.run("block-spacing", rule, {
             output: "if (a) {/* comment */ foo(); /* comment */}",
             options: ["never"],
             errors: [
-                { type: "BlockStatement", line: 1, column: 8, message: "Unexpected space(s) after '{'." },
-                { type: "BlockStatement", line: 1, column: 45, message: "Unexpected space(s) before '}'." }
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "after", token: "{" },
+                    line: 1,
+                    column: 9,
+                    endLine: 1,
+                    endColumn: 10
+                },
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "before", token: "}" },
+                    line: 1,
+                    column: 44,
+                    endLine: 1,
+                    endColumn: 45
+                }
+            ]
+        },
+        {
+            code: "(() => {   bar();});",
+            output: "(() => {bar();});",
+            options: ["never"],
+            parserOptions: { ecmaVersion: 6 },
+            errors: [
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "after", token: "{" },
+                    line: 1,
+                    column: 9,
+                    endLine: 1,
+                    endColumn: 12
+                }
+            ]
+        },
+        {
+            code: "(() => {bar();   });",
+            output: "(() => {bar();});",
+            options: ["never"],
+            parserOptions: { ecmaVersion: 6 },
+            errors: [
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "before", token: "}" },
+                    line: 1,
+                    column: 15,
+                    endLine: 1,
+                    endColumn: 18
+                }
+            ]
+        },
+        {
+            code: "(() => {   bar();   });",
+            output: "(() => {bar();});",
+            options: ["never"],
+            parserOptions: { ecmaVersion: 6 },
+            errors: [
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "after", token: "{" },
+                    line: 1,
+                    column: 9,
+                    endLine: 1,
+                    endColumn: 12
+                },
+                {
+                    type: "BlockStatement",
+                    messageId: "extra",
+                    data: { location: "before", token: "}" },
+                    line: 1,
+                    column: 18,
+                    endLine: 1,
+                    endColumn: 21
+                }
             ]
         }
     ]

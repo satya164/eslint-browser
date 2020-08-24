@@ -41,16 +41,38 @@ New Committers can be nominated by any existing Committer. Once they have been n
 
 It is important to recognize that committership is a privilege, not a right. That privilege must be earned and once earned it can be removed by the TSC members by a standard TSC motion. However, under normal circumstances committership exists for as long as the Committer wishes to continue engaging with the project.
 
-A Committer who shows an above-average level of contribution to the project, particularly with respect to its strategic direction and long-term health, may be nominated to become a TSC member, described below.
+A Committer who shows an above-average level of contribution to the project, particularly with respect to its strategic direction and long-term health, may be nominated to become a reviewer, described below.
 
 #### Process for Adding Committers
 
+1. Send email congratulating the new committer and confirming that they would like to accept. This should also outline the responsibilities of a committer with a link to the maintainer guide.
 1. Add the GitHub user to the "ESLint Team" team
-2. Send welcome email with link to maintainer guide
-3. Add committer email to the ESLint team mailing list
-4. Add committer to the README
-5. Invite to Gitter team chatroom
-6. Tweet congratulations to the new committer from the ESLint Twitter account
+1. Add committer email to the ESLint team mailing list
+1. Invite to Discord team channel
+1. Tweet congratulations to the new committer from the ESLint Twitter account
+
+### Reviewers
+
+Reviewers are community members who have contributed a significant amount of time to the project through triaging of issues, fixing bugs, implementing enhancements/features, and are trusted community leaders.
+
+Reviewers may perform all of the duties of Committers, and also:
+
+* May merge external pull requests for accepted issues upon reviewing and approving the changes.
+* May merge their own pull requests once they have collected the feedback they deem necessary. (No pull request should be merged without at least one Committer/Reviewer/TSC member comment stating they've looked at the code.)
+
+To become a Reviewer:
+
+* Work in a helpful and collaborative way with the community.
+* Have given good feedback on others' submissions and displayed an overall understanding of the code quality standards for the project.
+* Commit to being a part of the community for the long-term.
+* Have submitted a minimum of 50 qualifying pull requests.
+
+A Committer is invited to become a Reviewer by existing Reviewers and TSC members. A nomination will result in discussion and then a decision by the TSC.
+
+#### Process for Adding Reviewers
+
+1. Add the GitHub user to the "ESLint Reviewers" GitHub team
+1. Tweet congratulations to the new Reviewer from the ESLint Twitter account
 
 ### Technical Steering Committee (TSC)
 
@@ -63,47 +85,44 @@ The TSC has final authority over this project including:
 * Contribution policy
 * GitHub repository hosting
 
-TSC seats are not time-limited. There is no fixed size of the TSC. The TSC should be of such a size as to ensure adequate coverage of important areas of expertise balanced with the ability to make decisions efficiently.
+TSC seats are not time-limited. The size of the TSC can not be larger than five members. This size ensures adequate coverage of important areas of expertise balanced with the ability to make decisions efficiently.
 
 The TSC may add additional members to the TSC by a standard TSC motion.
 
-A TSC member may be removed from the TSC by voluntary resignation, or by a standard TSC motion.
+A TSC member may be removed from the TSC by voluntary resignation, by a standard TSC motion, or by missing four consecutive TSC meetings. In all cases, the TSC member will revert to Reviewer status unless they prefer Alumni status.
 
 Changes to TSC membership should be posted in the agenda, and may be suggested as any other agenda item (see "TSC Meetings" below).
 
 No more than 1/3 of the TSC members may be affiliated with the same employer. If removal or resignation of a TSC member, or a change of employment by a TSC member, creates a situation where more than 1/3 of the TSC membership shares an employer, then the situation must be immediately remedied by the resignation or removal of one or more TSC members affiliated with the over-represented employer(s).
 
-TSC members have additional responsibilities over and above those of a Committer. These responsibilities ensure the smooth running of the project. TSC members are expected to review code contributions, approve changes to this document, manage the copyrights within the project outputs, and attend regular TSC meetings.
+TSC members have additional responsibilities over and above those of a Reviewer. These responsibilities ensure the smooth running of the project. TSC members are expected to review code contributions, approve changes to this document, manage the copyrights within the project outputs, and attend regular TSC meetings.
 
-TSC members fulfill all requirements of Committers, and also:
+TSC members may perform all of the duties of Reviewers, and also:
 
-* May merge external pull requests for accepted issues upon reviewing and approving the changes.
-* May merge their own pull requests once they have collected the feedback they deem necessary. (No pull request should be merged without at least one Committer/TSC member comment stating they've looked at the code.)
+* May release new versions of all ESLint projects.
+* May participate in TSC meetings.
+* May propose budget items.
+* May propose new ESLint projects.
 
-To become a TSC member:
+There is no specific set of requirements or qualifications for TSC members beyond those that are expected of Reviewers.
 
-* Work in a helpful and collaborative way with the community.
-* Have given good feedback on others' submissions and displayed an overall understanding of the code quality standards for the project.
-* Commit to being a part of the community for the long-term.
-* Have submitted a minimum of 50 qualifying pull requests.
-
-A Committer is invited to become a TSC member by existing TSC members. A nomination will result in discussion and then a decision by the TSC.
+A Reviewer is invited to become a TSC member by existing TSC members. A nomination will result in discussion and then a decision by the TSC.
 
 #### Process for Adding TSC Members
 
-1. Add the GitHub user to the "ESLint TSC" team
-2. Set the GitHub user to be have the "Owner" role for the ESLint organization
-3. Send welcome email with link to maintainer guide
-4. Add TSC member to the README
-5. Invite to Gitter TSC chatroom
-6. Make TSC member an admin on the ESLint team mailing list
-7. Add TSC member as an admin to ESLint Twitter Account on Tweetdeck
-8. Tweet congratulations to the new TSC member from the ESLint Twitter account
+1. Add the GitHub user to the "ESLint TSC" GitHub team
+1. Set the GitHub user to be have the "Owner" role for the ESLint organization
+1. Send a welcome email with a link to the [maintainer guide](./) and the [npm 2FA guide](./npm-2fa).
+1. Invite to the Discord TSC channel
+1. Make the TSC member an admin on the ESLint team mailing list
+1. Add the TSC member to the recurring TSC meeting event on Google Calendar
+1. Add the TSC member as an admin to ESLint Twitter Account on Tweetdeck
+1. Add the TSC member to the ESLint TSC mailing list as an "Owner"
+1. Tweet congratulations to the new TSC member from the ESLint Twitter account
 
 #### TSC Meetings
 
-The TSC meets every other week in the [TSC Meeting](https://gitter.im/eslint/tsc-meetings) chatroom. The meeting is run by
-a designated moderator approved by the TSC.
+The TSC meets every other week in the TSC Meeting [Discord](https://eslint.org/chat) channel. The meeting is run by a designated moderator approved by the TSC.
 
 Items are added to the TSC agenda which are considered contentious or
 are modifications of governance, contribution policy, TSC membership,
@@ -113,7 +132,7 @@ The intention of the agenda is not to approve or review all patches.
 That should happen continuously on GitHub and be handled by the larger
 group of Committers.
 
-Any community member or committer can ask that something be added to
+Any community member, Committer, or Reviewer can ask that something be added to
 the next meeting's agenda by logging a GitHub Issue. Anyone can add the item to the agenda by adding
 the "tsc agenda" tag to the issue.
 
@@ -124,7 +143,7 @@ cannot veto or remove items.
 
 No binding votes on TSC agenda items can take place without a quorum of
 TSC members present in the meeting. Quorum is achieved when more than
-half of the TSC members are present.
+half of the TSC members (minus non-attending members) are present.
 
 The TSC may invite persons or representatives from certain projects to
 participate in a non-voting capacity.
@@ -135,7 +154,7 @@ agenda item and sending it as a pull request after the meeting.
 ## Consensus Seeking Process
 
 The TSC follows a
-[Consensus Seeking](http://en.wikipedia.org/wiki/Consensus-seeking_decision-making)
+[Consensus Seeking](https://en.wikipedia.org/wiki/Consensus-seeking_decision-making)
 decision making model.
 
 When an agenda item has appeared to reach a consensus, the moderator
@@ -151,4 +170,4 @@ or else the discussion will continue. Simple majority wins.
 
 This work is a derivative of [YUI Contributor Model](https://github.com/yui/yui3/wiki/Contributor-Model) and the [Node.js Project Governance Model](https://github.com/nodejs/node/blob/master/GOVERNANCE.md).
 
-This work is licensed under a [Creative Commons Attribution-ShareAlike 2.0 UK: England & Wales License](http://creativecommons.org/licenses/by-sa/2.0/uk/).
+This work is licensed under a [Creative Commons Attribution-ShareAlike 2.0 UK: England & Wales License](https://creativecommons.org/licenses/by-sa/2.0/uk/).

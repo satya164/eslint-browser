@@ -24,14 +24,14 @@ Examples of **incorrect** code for this rule with the default `{ "max": 4 }` opt
 
 function foo() {
     for (;;) { // Nested 1 deep
-        let val = () => (param) => { // Nested 2 deep
+        while (true) { // Nested 2 deep
             if (true) { // Nested 3 deep
                 if (true) { // Nested 4 deep
                     if (true) { // Nested 5 deep
                     }
                 }
             }
-        };
+        }
     }
 }
 ```
@@ -44,12 +44,12 @@ Examples of **correct** code for this rule with the default `{ "max": 4 }` optio
 
 function foo() {
     for (;;) { // Nested 1 deep
-        let val = () => (param) => { // Nested 2 deep
-           if (true) { // Nested 3 deep
+        while (true) { // Nested 2 deep
+            if (true) { // Nested 3 deep
                 if (true) { // Nested 4 deep
                 }
             }
-        };
+        }
     }
 }
 ```
@@ -58,6 +58,8 @@ function foo() {
 
 * [complexity](complexity.md)
 * [max-len](max-len.md)
+* [max-lines](max-lines.md)
+* [max-lines-per-function](max-lines-per-function.md)
 * [max-nested-callbacks](max-nested-callbacks.md)
 * [max-params](max-params.md)
 * [max-statements](max-statements.md)

@@ -1,5 +1,7 @@
 # Disallow process.exit() (no-process-exit)
 
+This rule was **deprecated** in ESLint v7.0.0. Please use the corresponding rule in [`eslint-plugin-node`](https://github.com/mysticatea/eslint-plugin-node).
+
 The `process.exit()` method in Node.js is used to immediately stop the Node.js process and exit. This is a dangerous operation because it can occur in any method at any point in time, potentially stopping a Node.js application completely when an error occurs. For example:
 
 ```js
@@ -18,6 +20,8 @@ if (somethingBadHappened) {
 ```
 
 By throwing an error in this way, other parts of the application have an opportunity to handle the error rather than stopping the application altogether. If the error bubbles all the way up to the process without being handled, then the process will exit and a non-zero exit code will returned, so the end result is the same.
+
+If you are using `process.exit()` only for specifying the exit code, you can set [`process.exitCode`](https://nodejs.org/api/process.html#process_process_exitcode) (introduced in Node.js 0.11.8) instead.
 
 ## Rule Details
 

@@ -1,6 +1,6 @@
 # require object keys to be sorted (sort-keys)
 
-When declaring multiple properties, some developers prefer to sort property names alphabetically to be able to find necessary property easier at the later time. Others feel that it adds complexity and becomes burden to maintain.
+When declaring multiple properties, some developers prefer to sort property names alphabetically to more easily find and/or diff necessary properties at a later time. Others feel that it adds complexity and becomes burden to maintain.
 
 ## Rule Details
 
@@ -52,13 +52,16 @@ let obj = {a: 1, [c + d]: 3, b: 2};
 let obj = {a: 1, ["c" + "d"]: 3, b: 2};
 let obj = {a: 1, [`${c}`]: 3, b: 2};
 let obj = {a: 1, [tag`c`]: 3, b: 2};
+
+// This rule does not report unsorted properties that are separated by a spread property.
+let obj = {b: 1, ...c, a: 2};
 ```
 
 ## Options
 
 ```json
 {
-    "sort-keys": ["error", "asc", {"caseSensitive": true, "natural": false}]
+    "sort-keys": ["error", "asc", {"caseSensitive": true, "natural": false, "minKeys": 2}]
 }
 ```
 
@@ -67,10 +70,27 @@ The 1st option is `"asc"` or `"desc"`.
 * `"asc"` (default) - enforce properties to be in ascending order.
 * `"desc"` - enforce properties to be in descending order.
 
-The 2nd option is an object which has 2 properties.
+The 2nd option is an object which has 3 properties.
 
 * `caseSensitive` - if `true`, enforce properties to be in case-sensitive order. Default is `true`.
-* `natural` - if `true`, enforce properties to be in natural order. Default is `false`.
+* `minKeys` - Specifies the minimum number of keys that an object should have in order for the object's unsorted keys to produce an error. Default is `2`, which means by default all objects with unsorted keys will result in lint errors.
+* `natural` - if `true`, enforce properties to be in natural order. Default is `false`. Natural Order compares strings containing combination of letters and numbers in the way a human being would sort. It basically sorts numerically, instead of sorting alphabetically. So the number 10 comes after the number 3 in Natural Sorting.
+
+Example for a list:
+
+With `natural` as true, the ordering would be
+1
+3
+6
+8
+10
+
+With `natural` as false, the ordering would be
+1
+10
+3
+6
+8
 
 ### desc
 
@@ -148,15 +168,61 @@ Examples of **correct** code for the `{natural: true}` option:
 let obj = {1: a, 2: b, 10: c};
 ```
 
+### minKeys
+
+Examples of **incorrect** code for the `{minKeys: 4}` option:
+
+```js
+/*eslint sort-keys: ["error", "asc", {minKeys: 4}]*/
+/*eslint-env es6*/
+
+// 4 keys
+let obj = {
+    b: 2,
+    a: 1, // not sorted correctly (should be 1st key)
+    c: 3,
+    d: 4,
+};
+
+// 5 keys
+let obj = {
+    2: 'a',
+    1: 'b', // not sorted correctly (should be 1st key)
+    3: 'c',
+    4: 'd',
+    5: 'e',
+};
+```
+
+Examples of **correct** code for the `{minKeys: 4}` option:
+
+```js
+/*eslint sort-keys: ["error", "asc", {minKeys: 4}]*//
+/*eslint-env es6*/
+
+// 3 keys
+let obj = {
+    b: 2,
+    a: 1,
+    c: 3,
+};
+
+// 2 keys
+let obj = {
+    2: 'b',
+    1: 'a',
+};
+```
+
 ## When Not To Use It
 
 If you don't want to notify about properties' order, then it's safe to disable this rule.
 
 ## Related Rules
 
-* [sort-imports](http://eslint.org/docs/rules/sort-imports)
-* [sort-vars](http://eslint.org/docs/rules/sort-vars)
+* [sort-imports](sort-imports.md)
+* [sort-vars](sort-vars.md)
 
 ## Compatibility
 
-* **JSCS:** [validateOrderInObjectKeys](http://jscs.info/rule/validateOrderInObjectKeys)
+* **JSCS:** [validateOrderInObjectKeys](https://jscs-dev.github.io/rule/validateOrderInObjectKeys)

@@ -9,17 +9,23 @@
 // Requirements
 //------------------------------------------------------------------------------
 
-const path = require("path"),
-    rule = require("../../../lib/rules/space-infix-ops"),
-    RuleTester = require("../../../lib/testers/rule-tester");
+const rule = require("../../../lib/rules/space-infix-ops"),
+    { RuleTester } = require("../../../lib/rule-tester"),
+    parser = require("../../fixtures/fixture-parser");
 
 const ruleTester = new RuleTester();
 
 ruleTester.run("space-infix-ops", rule, {
     valid: [
         "a + b",
+        "a + ++b",
+        "a++ + b",
+        "a++ + ++b",
         "a     + b",
         "(a) + (b)",
+        "((a)) + ((b))",
+        "(((a))) + (((b)))",
+        "a + +b",
         "a + (b)",
         "a + +(b)",
         "a + (+(b))",
@@ -30,77 +36,98 @@ ruleTester.run("space-infix-ops", rule, {
         { code: "const my_object = {key: 'value'};", parserOptions: { ecmaVersion: 6 } },
         { code: "var {a = 0} = bar;", parserOptions: { ecmaVersion: 6 } },
         { code: "function foo(a = 0) { }", parserOptions: { ecmaVersion: 6 } },
-        { code: "function foo(a: number = 0) { }", parser: path.resolve(__dirname, "../../fixtures/parsers/flow-stub-parser.js"), parserOptions: { ecmaVersion: 6 } },
         { code: "a ** b", parserOptions: { ecmaVersion: 7 } },
         { code: "a|0", options: [{ int32Hint: true }] },
-        { code: "a |0", options: [{ int32Hint: true }] }
+        { code: "a |0", options: [{ int32Hint: true }] },
+
+        // Type Annotations
+        { code: "function foo(a: number = 0) { }", parser: parser("type-annotations/function-parameter-type-annotation"), parserOptions: { ecmaVersion: 6 } },
+        { code: "function foo(): Bar { }", parser: parser("type-annotations/function-return-type-annotation"), parserOptions: { ecmaVersion: 6 } },
+        { code: "var foo: Bar = '';", parser: parser("type-annotations/variable-declaration-init-type-annotation"), parserOptions: { ecmaVersion: 6 } },
+        { code: "const foo = function(a: number = 0): Bar { };", parser: parser("type-annotations/function-expression-type-annotation"), parserOptions: { ecmaVersion: 6 } },
+
+        // TypeScript Type Aliases
+        { code: "type Foo<T> = T;", parser: parser("typescript-parsers/type-alias"), parserOptions: { ecmaVersion: 6 } }
     ],
     invalid: [
         {
             code: "a+b",
             output: "a + b",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "+" },
                 type: "BinaryExpression",
                 line: 1,
-                column: 2
+                column: 2,
+                endColumn: 3
             }]
         },
         {
             code: "a +b",
             output: "a + b",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "+" },
                 type: "BinaryExpression",
                 line: 1,
-                column: 3
+                column: 3,
+                endColumn: 4
             }]
         },
         {
             code: "a+ b",
             output: "a + b",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "+" },
                 type: "BinaryExpression",
                 line: 1,
-                column: 2
+                column: 2,
+                endColumn: 3
             }]
         },
         {
             code: "a||b",
             output: "a || b",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "||" },
                 type: "LogicalExpression",
                 line: 1,
-                column: 2
+                column: 2,
+                endColumn: 4
             }]
         },
         {
             code: "a ||b",
             output: "a || b",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "||" },
                 type: "LogicalExpression",
                 line: 1,
-                column: 3
+                column: 3,
+                endColumn: 5
             }]
         },
         {
             code: "a|| b",
             output: "a || b",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "||" },
                 type: "LogicalExpression",
                 line: 1,
-                column: 2
+                column: 2,
+                endColumn: 4
             }]
         },
         {
             code: "a=b",
             output: "a = b",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "=" },
                 type: "AssignmentExpression",
                 line: 1,
                 column: 2
@@ -110,7 +137,8 @@ ruleTester.run("space-infix-ops", rule, {
             code: "a= b",
             output: "a = b",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "=" },
                 type: "AssignmentExpression",
                 line: 1,
                 column: 2
@@ -120,7 +148,8 @@ ruleTester.run("space-infix-ops", rule, {
             code: "a =b",
             output: "a = b",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "=" },
                 type: "AssignmentExpression",
                 line: 1,
                 column: 3
@@ -130,77 +159,92 @@ ruleTester.run("space-infix-ops", rule, {
             code: "a?b:c",
             output: "a ? b:c",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "?" },
                 type: "ConditionalExpression",
                 line: 1,
-                column: 2
+                column: 2,
+                endColumn: 3
             }]
         },
         {
             code: "a?b : c",
             output: "a ? b : c",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "?" },
                 type: "ConditionalExpression",
                 line: 1,
-                column: 2
+                column: 2,
+                endColumn: 3
             }]
         },
         {
             code: "a ? b:c",
             output: "a ? b : c",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: ":" },
                 type: "ConditionalExpression",
                 line: 1,
-                column: 6
+                column: 6,
+                endColumn: 7
             }]
         },
         {
             code: "a? b : c",
             output: "a ? b : c",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "?" },
                 type: "ConditionalExpression",
                 line: 1,
-                column: 2
+                column: 2,
+                endColumn: 3
             }]
         },
         {
             code: "a ?b : c",
             output: "a ? b : c",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "?" },
                 type: "ConditionalExpression",
                 line: 1,
-                column: 3
+                column: 3,
+                endColumn: 4
             }]
         },
         {
             code: "a ? b: c",
             output: "a ? b : c",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: ":" },
                 type: "ConditionalExpression",
                 line: 1,
-                column: 6
+                column: 6,
+                endColumn: 7
             }]
         },
         {
             code: "a ? b :c",
             output: "a ? b : c",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: ":" },
                 type: "ConditionalExpression",
                 line: 1,
-                column: 7
+                column: 7,
+                endColumn: 8
             }]
         },
         {
             code: "var a=b;",
             output: "var a = b;",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "=" },
                 type: "VariableDeclarator",
                 line: 1,
                 column: 6
@@ -210,7 +254,8 @@ ruleTester.run("space-infix-ops", rule, {
             code: "var a= b;",
             output: "var a = b;",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "=" },
                 type: "VariableDeclarator",
                 line: 1,
                 column: 6
@@ -220,7 +265,8 @@ ruleTester.run("space-infix-ops", rule, {
             code: "var a =b;",
             output: "var a = b;",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "=" },
                 type: "VariableDeclarator",
                 line: 1,
                 column: 7
@@ -230,7 +276,8 @@ ruleTester.run("space-infix-ops", rule, {
             code: "var a = b, c=d;",
             output: "var a = b, c = d;",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "=" },
                 type: "VariableDeclarator",
                 line: 1,
                 column: 13
@@ -243,7 +290,8 @@ ruleTester.run("space-infix-ops", rule, {
                 int32Hint: true
             }],
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "|" },
                 type: "BinaryExpression",
                 line: 1,
                 column: 2
@@ -253,7 +301,8 @@ ruleTester.run("space-infix-ops", rule, {
             code: "var output = test || (test && test.value) ||(test2 && test2.value);",
             output: "var output = test || (test && test.value) || (test2 && test2.value);",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "||" },
                 type: "LogicalExpression",
                 line: 1,
                 column: 43
@@ -263,7 +312,8 @@ ruleTester.run("space-infix-ops", rule, {
             code: "var output = a ||(b && c.value) || (d && e.value);",
             output: "var output = a || (b && c.value) || (d && e.value);",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "||" },
                 type: "LogicalExpression",
                 line: 1,
                 column: 16
@@ -273,7 +323,8 @@ ruleTester.run("space-infix-ops", rule, {
             code: "var output = a|| (b && c.value) || (d && e.value);",
             output: "var output = a || (b && c.value) || (d && e.value);",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "||" },
                 type: "LogicalExpression",
                 line: 1,
                 column: 15
@@ -284,7 +335,8 @@ ruleTester.run("space-infix-ops", rule, {
             output: "const my_object = {key: 'value'}",
             parserOptions: { ecmaVersion: 6 },
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "=" },
                 type: "VariableDeclarator",
                 line: 1,
                 column: 16
@@ -295,15 +347,17 @@ ruleTester.run("space-infix-ops", rule, {
             output: "var {a = 0} = bar;",
             parserOptions: { ecmaVersion: 6 },
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "=" },
                 line: 1,
                 column: 7,
-                nodeType: "AssignmentPattern"
+                type: "AssignmentPattern"
             }, {
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "=" },
                 line: 1,
                 column: 10,
-                nodeType: "VariableDeclarator"
+                type: "VariableDeclarator"
             }]
         },
         {
@@ -311,10 +365,11 @@ ruleTester.run("space-infix-ops", rule, {
             output: "function foo(a = 0) { }",
             parserOptions: { ecmaVersion: 6 },
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "=" },
                 line: 1,
                 column: 15,
-                nodeType: "AssignmentPattern"
+                type: "AssignmentPattern"
             }]
         },
         {
@@ -322,30 +377,61 @@ ruleTester.run("space-infix-ops", rule, {
             output: "a ** b",
             parserOptions: { ecmaVersion: 7 },
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "**" },
                 line: 1,
                 column: 2,
-                nodeType: "BinaryExpression"
+                type: "BinaryExpression"
             }]
         },
         {
             code: "'foo'in{}",
             output: "'foo' in {}",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "in" },
                 line: 1,
                 column: 6,
-                nodeType: "BinaryExpression"
+                type: "BinaryExpression"
             }]
         },
         {
             code: "'foo'instanceof{}",
             output: "'foo' instanceof {}",
             errors: [{
-                message: "Infix operators must be spaced.",
+                messageId: "missingSpace",
+                data: { operator: "instanceof" },
                 line: 1,
                 column: 6,
-                nodeType: "BinaryExpression"
+                type: "BinaryExpression"
+            }]
+        },
+
+        // Type Annotations
+
+        {
+            code: "var a: Foo= b;",
+            output: "var a: Foo = b;",
+            parser: parser("type-annotations/variable-declaration-init-type-annotation-no-space"),
+            errors: [{
+                messageId: "missingSpace",
+                data: { operator: "=" },
+                type: "VariableDeclarator",
+                line: 1,
+                column: 11
+            }]
+        },
+        {
+            code: "function foo(a: number=0): Foo { }",
+            output: "function foo(a: number = 0): Foo { }",
+            parser: parser("type-annotations/function-declaration-type-annotation-no-space"),
+            parserOptions: { ecmaVersion: 6 },
+            errors: [{
+                messageId: "missingSpace",
+                data: { operator: "=" },
+                line: 1,
+                column: 23,
+                type: "AssignmentPattern"
             }]
         }
     ]

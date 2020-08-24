@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 
 const rule = require("../../../lib/rules/no-delete-var"),
-    RuleTester = require("../../../lib/testers/rule-tester");
+    { RuleTester } = require("../../../lib/rule-tester");
 
 //------------------------------------------------------------------------------
 // Tests
@@ -23,6 +23,6 @@ ruleTester.run("no-delete-var", rule, {
         "delete x.prop;"
     ],
     invalid: [
-        { code: "delete x", errors: [{ message: "Variables should not be deleted.", type: "UnaryExpression" }] }
+        { code: "delete x", errors: [{ messageId: "unexpected", type: "UnaryExpression" }] }
     ]
 });

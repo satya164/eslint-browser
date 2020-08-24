@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 
 const rule = require("../../../lib/rules/no-eval"),
-    RuleTester = require("../../../lib/testers/rule-tester");
+    { RuleTester } = require("../../../lib/rule-tester");
 
 //------------------------------------------------------------------------------
 // Tests
@@ -35,9 +35,14 @@ ruleTester.run("no-eval", rule, {
         { code: "global.eval('foo')", env: { browser: true } },
         { code: "global.noeval('foo')", env: { node: true } },
         { code: "function foo() { var eval = 'foo'; global[eval]('foo') }", env: { node: true } },
+        "globalThis.eval('foo')",
+        { code: "globalThis.eval('foo')", env: { es2017: true } },
+        { code: "globalThis.eval('foo')", env: { browser: true } },
+        { code: "globalThis.noneval('foo')", env: { es2020: true } },
+        { code: "function foo() { var eval = 'foo'; globalThis[eval]('foo') }", env: { es2020: true } },
         "this.noeval('foo');",
         "function foo() { 'use strict'; this.eval('foo'); }",
-        { code: "function foo() { this.eval('foo'); }", parserOptions: { sourceType: "module" } },
+        { code: "function foo() { this.eval('foo'); }", parserOptions: { ecmaVersion: 6, sourceType: "module" } },
         { code: "function foo() { this.eval('foo'); }", parserOptions: { ecmaFeatures: { impliedStrict: true } } },
         "var obj = {foo: function() { this.eval('foo'); }}",
         "var obj = {}; obj.foo = function() { this.eval('foo'); }",
@@ -46,44 +51,78 @@ ruleTester.run("no-eval", rule, {
 
         // Allows indirect eval
         { code: "(0, eval)('foo')", options: [{ allowIndirect: true }] },
-        { code: "(0, window.eval)('foo')", env: { browser: true }, options: [{ allowIndirect: true }] },
-        { code: "(0, window['eval'])('foo')", env: { browser: true }, options: [{ allowIndirect: true }] },
+        { code: "(0, window.eval)('foo')", options: [{ allowIndirect: true }], env: { browser: true } },
+        { code: "(0, window['eval'])('foo')", options: [{ allowIndirect: true }], env: { browser: true } },
         { code: "var EVAL = eval; EVAL('foo')", options: [{ allowIndirect: true }] },
         { code: "var EVAL = this.eval; EVAL('foo')", options: [{ allowIndirect: true }] },
         { code: "(function(exe){ exe('foo') })(eval);", options: [{ allowIndirect: true }] },
-        { code: "window.eval('foo')", env: { browser: true }, options: [{ allowIndirect: true }] },
-        { code: "window.window.eval('foo')", env: { browser: true }, options: [{ allowIndirect: true }] },
-        { code: "window.window['eval']('foo')", env: { browser: true }, options: [{ allowIndirect: true }] },
-        { code: "global.eval('foo')", env: { node: true }, options: [{ allowIndirect: true }] },
-        { code: "global.global.eval('foo')", env: { node: true }, options: [{ allowIndirect: true }] },
+        { code: "window.eval('foo')", options: [{ allowIndirect: true }], env: { browser: true } },
+        { code: "window.window.eval('foo')", options: [{ allowIndirect: true }], env: { browser: true } },
+        { code: "window.window['eval']('foo')", options: [{ allowIndirect: true }], env: { browser: true } },
+        { code: "global.eval('foo')", options: [{ allowIndirect: true }], env: { node: true } },
+        { code: "global.global.eval('foo')", options: [{ allowIndirect: true }], env: { node: true } },
         { code: "this.eval('foo')", options: [{ allowIndirect: true }] },
-        { code: "function foo() { this.eval('foo') }", options: [{ allowIndirect: true }] }
+        { code: "function foo() { this.eval('foo') }", options: [{ allowIndirect: true }] },
+        { code: "(0, globalThis.eval)('foo')", options: [{ allowIndirect: true }], env: { es2020: true } },
+        { code: "(0, globalThis['eval'])('foo')", options: [{ allowIndirect: true }], env: { es2020: true } },
+        { code: "var EVAL = globalThis.eval; EVAL('foo')", options: [{ allowIndirect: true }] },
+        { code: "function foo() { globalThis.eval('foo') }", options: [{ allowIndirect: true }], env: { es2020: true } },
+        { code: "globalThis.globalThis.eval('foo');", options: [{ allowIndirect: true }], env: { es2020: true } },
+        { code: "eval?.('foo')", options: [{ allowIndirect: true }], parserOptions: { ecmaVersion: 2020 } },
+        { code: "window?.eval('foo')", options: [{ allowIndirect: true }], parserOptions: { ecmaVersion: 2020 }, env: { browser: true } },
+        { code: "(window?.eval)('foo')", options: [{ allowIndirect: true }], parserOptions: { ecmaVersion: 2020 }, env: { browser: true } }
     ],
 
     invalid: [
 
         // Direct eval
-        { code: "eval(foo)", errors: [{ message: "eval can be harmful.", type: "CallExpression" }] },
-        { code: "eval('foo')", errors: [{ message: "eval can be harmful.", type: "CallExpression" }] },
-        { code: "function foo(eval) { eval('foo') }", errors: [{ message: "eval can be harmful.", type: "CallExpression" }] },
-        { code: "eval(foo)", options: [{ allowIndirect: true }], errors: [{ message: "eval can be harmful.", type: "CallExpression" }] },
-        { code: "eval('foo')", options: [{ allowIndirect: true }], errors: [{ message: "eval can be harmful.", type: "CallExpression" }] },
-        { code: "function foo(eval) { eval('foo') }", options: [{ allowIndirect: true }], errors: [{ message: "eval can be harmful.", type: "CallExpression" }] },
+        { code: "eval(foo)", errors: [{ messageId: "unexpected", type: "CallExpression", column: 1, endColumn: 5 }] },
+        { code: "eval('foo')", errors: [{ messageId: "unexpected", type: "CallExpression", column: 1, endColumn: 5 }] },
+        { code: "function foo(eval) { eval('foo') }", errors: [{ messageId: "unexpected", type: "CallExpression", column: 22, endColumn: 26 }] },
+        { code: "eval(foo)", options: [{ allowIndirect: true }], errors: [{ messageId: "unexpected", type: "CallExpression", column: 1, endColumn: 5 }] },
+        { code: "eval('foo')", options: [{ allowIndirect: true }], errors: [{ messageId: "unexpected", type: "CallExpression", column: 1, endColumn: 5 }] },
+        { code: "function foo(eval) { eval('foo') }", options: [{ allowIndirect: true }], errors: [{ messageId: "unexpected", type: "CallExpression", column: 22, endColumn: 26 }] },
 
         // Indirect eval
-        { code: "(0, eval)('foo')", errors: [{ message: "eval can be harmful.", type: "Identifier" }] },
-        { code: "(0, window.eval)('foo')", env: { browser: true }, errors: [{ message: "eval can be harmful.", type: "MemberExpression" }] },
-        { code: "(0, window['eval'])('foo')", env: { browser: true }, errors: [{ message: "eval can be harmful.", type: "MemberExpression" }] },
-        { code: "var EVAL = eval; EVAL('foo')", errors: [{ message: "eval can be harmful.", type: "Identifier" }] },
-        { code: "var EVAL = this.eval; EVAL('foo')", errors: [{ message: "eval can be harmful.", type: "MemberExpression" }] },
-        { code: "(function(exe){ exe('foo') })(eval);", errors: [{ message: "eval can be harmful.", type: "Identifier" }] },
-        { code: "window.eval('foo')", env: { browser: true }, errors: [{ message: "eval can be harmful.", type: "CallExpression" }] },
-        { code: "window.window.eval('foo')", env: { browser: true }, errors: [{ message: "eval can be harmful.", type: "CallExpression" }] },
-        { code: "window.window['eval']('foo')", env: { browser: true }, errors: [{ message: "eval can be harmful.", type: "CallExpression" }] },
-        { code: "global.eval('foo')", env: { node: true }, errors: [{ message: "eval can be harmful.", type: "CallExpression" }] },
-        { code: "global.global.eval('foo')", env: { node: true }, errors: [{ message: "eval can be harmful.", type: "CallExpression" }] },
-        { code: "global.global[`eval`]('foo')", env: { node: true }, parserOptions: { ecmaVersion: 6 }, errors: [{ message: "eval can be harmful.", type: "CallExpression" }] },
-        { code: "this.eval('foo')", errors: [{ message: "eval can be harmful.", type: "CallExpression" }] },
-        { code: "function foo() { this.eval('foo') }", errors: [{ message: "eval can be harmful.", type: "CallExpression" }] }
+        { code: "(0, eval)('foo')", errors: [{ messageId: "unexpected", type: "Identifier", column: 5, endColumn: 9 }] },
+        { code: "(0, window.eval)('foo')", env: { browser: true }, errors: [{ messageId: "unexpected", type: "MemberExpression", column: 12, endColumn: 16 }] },
+        { code: "(0, window['eval'])('foo')", env: { browser: true }, errors: [{ messageId: "unexpected", type: "MemberExpression", column: 12, endColumn: 18 }] },
+        { code: "var EVAL = eval; EVAL('foo')", errors: [{ messageId: "unexpected", type: "Identifier", column: 12, endColumn: 16 }] },
+        { code: "var EVAL = this.eval; EVAL('foo')", errors: [{ messageId: "unexpected", type: "MemberExpression", column: 17, endColumn: 21 }] },
+        { code: "(function(exe){ exe('foo') })(eval);", errors: [{ messageId: "unexpected", type: "Identifier", column: 31, endColumn: 35 }] },
+        { code: "window.eval('foo')", env: { browser: true }, errors: [{ messageId: "unexpected", type: "CallExpression", column: 8, endColumn: 12 }] },
+        { code: "window.window.eval('foo')", env: { browser: true }, errors: [{ messageId: "unexpected", type: "CallExpression", column: 15, endColumn: 19 }] },
+        { code: "window.window['eval']('foo')", env: { browser: true }, errors: [{ messageId: "unexpected", type: "CallExpression", column: 15, endColumn: 21 }] },
+        { code: "global.eval('foo')", env: { node: true }, errors: [{ messageId: "unexpected", type: "CallExpression", column: 8, endColumn: 12 }] },
+        { code: "global.global.eval('foo')", env: { node: true }, errors: [{ messageId: "unexpected", type: "CallExpression", column: 15, endColumn: 19 }] },
+        { code: "global.global[`eval`]('foo')", parserOptions: { ecmaVersion: 6 }, env: { node: true }, errors: [{ messageId: "unexpected", type: "CallExpression", column: 15, endColumn: 21 }] },
+        { code: "this.eval('foo')", errors: [{ messageId: "unexpected", type: "CallExpression", column: 6, endColumn: 10 }] },
+        { code: "function foo() { this.eval('foo') }", errors: [{ messageId: "unexpected", type: "CallExpression", column: 23, endColumn: 27 }] },
+        { code: "var EVAL = globalThis.eval; EVAL('foo')", env: { es2020: true }, errors: [{ messageId: "unexpected", type: "MemberExpression", column: 23, endColumn: 27 }] },
+        { code: "globalThis.eval('foo')", env: { es2020: true }, errors: [{ messageId: "unexpected", type: "CallExpression", column: 12, endColumn: 16 }] },
+        { code: "globalThis.globalThis.eval('foo')", env: { es2020: true }, errors: [{ messageId: "unexpected", type: "CallExpression", column: 23, endColumn: 27 }] },
+        { code: "globalThis.globalThis['eval']('foo')", env: { es2020: true }, errors: [{ messageId: "unexpected", type: "CallExpression", column: 23, endColumn: 29 }] },
+        { code: "(0, globalThis.eval)('foo')", env: { es2020: true }, errors: [{ messageId: "unexpected", type: "MemberExpression", column: 16, endColumn: 20 }] },
+        { code: "(0, globalThis['eval'])('foo')", env: { es2020: true }, errors: [{ messageId: "unexpected", type: "MemberExpression", column: 16, endColumn: 22 }] },
+
+        // Optional chaining
+        {
+            code: "window?.eval('foo')",
+            parserOptions: { ecmaVersion: 2020 },
+            globals: { window: "readonly" },
+            errors: [{ messageId: "unexpected" }]
+        },
+        {
+            code: "(window?.eval)('foo')",
+            parserOptions: { ecmaVersion: 2020 },
+            globals: { window: "readonly" },
+            errors: [{ messageId: "unexpected" }]
+        },
+        {
+            code: "(window?.window).eval('foo')",
+            parserOptions: { ecmaVersion: 2020 },
+            globals: { window: "readonly" },
+            errors: [{ messageId: "unexpected" }]
+        }
     ]
 });

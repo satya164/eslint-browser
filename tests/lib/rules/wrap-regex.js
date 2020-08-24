@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 
 const rule = require("../../../lib/rules/wrap-regex"),
-    RuleTester = require("../../../lib/testers/rule-tester");
+    { RuleTester } = require("../../../lib/rule-tester");
 
 //------------------------------------------------------------------------------
 // Tests
@@ -30,13 +30,20 @@ ruleTester.run("wrap-regex", rule, {
     invalid: [
         {
             code: "/foo/.test(bar);",
-            errors: [{ message: "Wrap the regexp literal in parens to disambiguate the slash.", type: "Literal" }],
-            output: "(/foo/).test(bar);"
+            output: "(/foo/).test(bar);",
+            errors: [{ messageId: "requireParens", type: "Literal" }]
         },
         {
             code: "/foo/ig.test(bar);",
-            errors: [{ message: "Wrap the regexp literal in parens to disambiguate the slash.", type: "Literal" }],
-            output: "(/foo/ig).test(bar);"
+            output: "(/foo/ig).test(bar);",
+            errors: [{ messageId: "requireParens", type: "Literal" }]
+        },
+
+        // https://github.com/eslint/eslint/issues/10573
+        {
+            code: "if(/foo/ig.test(bar));",
+            output: "if((/foo/ig).test(bar));",
+            errors: [{ messageId: "requireParens", type: "Literal" }]
         }
     ]
 });

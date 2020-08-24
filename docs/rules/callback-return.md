@@ -1,5 +1,7 @@
 # Enforce Return After Callback (callback-return)
 
+This rule was **deprecated** in ESLint v7.0.0. Please use the corresponding rule in [`eslint-plugin-node`](https://github.com/mysticatea/eslint-plugin-node).
+
 The callback pattern is at the heart of most I/O and event-driven programming
  in JavaScript.
 
@@ -76,7 +78,7 @@ function bar(err, send) {
 }
 ```
 
-Examples of **correct** code for this rule with the the option `["done", "send.error", "send.success"]`:
+Examples of **correct** code for this rule with the option `["done", "send.error", "send.success"]`:
 
 ```js
 /*eslint callback-return: ["error", ["done", "send.error", "send.success"]]*/
@@ -167,7 +169,7 @@ There are some cases where you might want to call a callback function more than 
 ## Further Reading
 
 * [The Art Of Node: Callbacks](https://github.com/maxogden/art-of-node#callbacks)
-* [Nodejitsu: What are the error conventions?](http://docs.nodejitsu.com/articles/errors/what-are-the-error-conventions)
+* [Nodejitsu: What are the error conventions?](https://docs.nodejitsu.com/articles/errors/what-are-the-error-conventions/)
 
 ## Related Rules
 

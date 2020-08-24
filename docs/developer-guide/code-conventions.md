@@ -1,6 +1,6 @@
 # Code Conventions
 
-Programming language style guides are important for the long-term maintainability of software. This guide is based on the [Code Conventions for the Java Programming Language](http://java.sun.com/docs/codeconv/) and [Douglas Crockford's Code Conventions for the JavaScript Programming Language](http://javascript.crockford.com/code.html). Modifications have been made due to my personal experience and preferences.
+Programming language style guides are important for the long-term maintainability of software. This guide is based on the [Code Conventions for the Java Programming Language](https://java.sun.com/docs/codeconv/) and [Douglas Crockford's Code Conventions for the JavaScript Programming Language](http://javascript.crockford.com/code.html). Modifications have been made due to my personal experience and preferences.
 
 ## File Format
 
@@ -169,7 +169,7 @@ Operators with two operands must be preceded and followed by a single space to m
 
 ## Parentheses Spacing
 
-When parentheses are used, there should be no white space immediately after the opening paren or immediately before the closing paren.
+When parentheses are used, there should be no whitespace immediately after the opening paren or immediately before the closing paren.
 
     // Good
     var found = (values[i] === item);
@@ -262,7 +262,7 @@ Make frequent use of comments to aid others in understanding your code. Use comm
 
 ### Single-Line Comments
 
-Single-line comments should be used to documentation one line of code or a group of related lines of code. A single-line comment may be used in three ways:
+Single-line comments should be used to document one line of code or a group of related lines of code. A single-line comment may be used in three ways:
 
 1. On a separate line, describing the code beneath it.
 1. At the end of a line, describing the code before it.
@@ -895,7 +895,7 @@ The `try` class of statements should have the following form:
         statements
     }
 
-## White Space
+## Whitespace
 
 Blank lines improve readability by setting off sections of code that are logically related.
 

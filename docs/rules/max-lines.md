@@ -110,16 +110,17 @@ You can turn this rule off if you are not concerned with the number of lines in 
 
 ## Further reading
 
-* [Software Module size and file size](http://www.mind2b.com/component/content/article/24-software-module-size-and-file-size)
+* [Software Module size and file size](https://web.archive.org/web/20160725154648/http://www.mind2b.com/component/content/article/24-software-module-size-and-file-size)
 
 ## Related Rules
 
 * [complexity](complexity.md)
 * [max-depth](max-depth.md)
+* [max-lines-per-function](max-lines-per-function.md)
 * [max-nested-callbacks](max-nested-callbacks.md)
 * [max-params](max-params.md)
 * [max-statements](max-statements.md)
 
 ## Compatibility
 
-* **JSCS**: [maximumNumberOfLines](http://jscs.info/rule/maximumNumberOfLines)
+* **JSCS**: [maximumNumberOfLines](https://jscs-dev.github.io/rule/maximumNumberOfLines)

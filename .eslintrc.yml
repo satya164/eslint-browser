@@ -1,7 +1,0 @@
-root: true
-
-plugins:
-    - node
-extends:
-    - "./packages/eslint-config-eslint/default.yml"
-    - "plugin:node/recommended"

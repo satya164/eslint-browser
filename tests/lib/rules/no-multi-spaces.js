@@ -9,7 +9,7 @@
 //------------------------------------------------------------------------------
 
 const rule = require("../../../lib/rules/no-multi-spaces"),
-    RuleTester = require("../../../lib/testers/rule-tester");
+    { RuleTester } = require("../../../lib/rule-tester");
 
 //------------------------------------------------------------------------------
 // Tests
@@ -74,7 +74,36 @@ ruleTester.run("no-multi-spaces", rule, {
         {
             code: "var  answer = 6 *  7;",
             options: [{ exceptions: { VariableDeclaration: true, BinaryExpression: true } }]
-        }
+        },
+
+        // https://github.com/eslint/eslint/issues/7693
+        "var x = 5; // comment",
+        "var x = 5; /* multiline\n * comment\n */",
+        "var x = 5;\n  // comment",
+        "var x = 5;  \n// comment",
+        "var x = 5;\n  /* multiline\n * comment\n */",
+        "var x = 5;  \n/* multiline\n * comment\n */",
+        { code: "var x = 5; // comment", options: [{ ignoreEOLComments: false }] },
+        { code: "var x = 5; /* multiline\n * comment\n */", options: [{ ignoreEOLComments: false }] },
+        { code: "var x = 5;\n  // comment", options: [{ ignoreEOLComments: false }] },
+        { code: "var x = 5;  \n// comment", options: [{ ignoreEOLComments: false }] },
+        { code: "var x = 5;\n  /* multiline\n * comment\n */", options: [{ ignoreEOLComments: false }] },
+        { code: "var x = 5;  \n/* multiline\n * comment\n */", options: [{ ignoreEOLComments: false }] },
+        { code: "var x = 5;  // comment", options: [{ ignoreEOLComments: true }] },
+        { code: "var x = 5;  /* multiline\n * comment\n */", options: [{ ignoreEOLComments: true }] },
+        { code: "var x = 5;\n  // comment", options: [{ ignoreEOLComments: true }] },
+        { code: "var x = 5;  \n// comment", options: [{ ignoreEOLComments: true }] },
+        { code: "var x = 5;\n  /* multiline\n * comment\n */", options: [{ ignoreEOLComments: true }] },
+        { code: "var x = 5;  \n/* multiline\n * comment\n */", options: [{ ignoreEOLComments: true }] },
+
+        "foo\n\f  bar",
+        "foo\n\u2003  bar",
+        "foo\n \f  bar",
+
+        // https://github.com/eslint/eslint/issues/9001
+        "a".repeat(2e5),
+
+        "foo\t\t+bar"
     ],
 
     invalid: [
@@ -82,8 +111,11 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "function foo(a,  b) {}",
             output: "function foo(a, b) {}",
             errors: [{
-                message: "Multiple spaces found before 'b'.",
-                type: "Identifier"
+                messageId: "multipleSpaces",
+                data: { displayValue: "b" },
+                type: "Identifier",
+                column: 16,
+                endColumn: 18
             }]
         },
         {
@@ -91,23 +123,30 @@ ruleTester.run("no-multi-spaces", rule, {
             output: "var foo = (a, b) => {}",
             parserOptions: { ecmaVersion: 6 },
             errors: [{
-                message: "Multiple spaces found before 'b'.",
-                type: "Identifier"
+                messageId: "multipleSpaces",
+                data: { displayValue: "b" },
+                type: "Identifier",
+                column: 14,
+                endColumn: 16
             }]
         },
         {
             code: "var a =  1",
             output: "var a = 1",
             errors: [{
-                message: "Multiple spaces found before '1'.",
-                type: "Numeric"
+                messageId: "multipleSpaces",
+                data: { displayValue: "1" },
+                type: "Numeric",
+                column: 8,
+                endColumn: 10
             }]
         },
         {
             code: "var a = 1,  b = 2;",
             output: "var a = 1, b = 2;",
             errors: [{
-                message: "Multiple spaces found before 'b'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "b" },
                 type: "Identifier"
             }]
         },
@@ -115,7 +154,8 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "a <<  b",
             output: "a << b",
             errors: [{
-                message: "Multiple spaces found before 'b'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "b" },
                 type: "Identifier"
             }]
         },
@@ -123,15 +163,19 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "var arr = {'a': 1,  'b': 2};",
             output: "var arr = {'a': 1, 'b': 2};",
             errors: [{
-                message: "Multiple spaces found before ''b''.",
-                type: "String"
+                messageId: "multipleSpaces",
+                data: { displayValue: "'b'" },
+                type: "String",
+                column: 19,
+                endColumn: 21
             }]
         },
         {
             code: "if (a &  b) { }",
             output: "if (a & b) { }",
             errors: [{
-                message: "Multiple spaces found before 'b'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "b" },
                 type: "Identifier"
             }]
         },
@@ -139,10 +183,12 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "if ( a === 3  &&  b === 4) {}",
             output: "if ( a === 3 && b === 4) {}",
             errors: [{
-                message: "Multiple spaces found before '&&'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "&&" },
                 type: "Punctuator"
             }, {
-                message: "Multiple spaces found before 'b'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "b" },
                 type: "Identifier"
             }]
         },
@@ -150,10 +196,12 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "var foo = bar === 1 ?  2:  3",
             output: "var foo = bar === 1 ? 2: 3",
             errors: [{
-                message: "Multiple spaces found before '2'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "2" },
                 type: "Numeric"
             }, {
-                message: "Multiple spaces found before '3'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "3" },
                 type: "Numeric"
             }]
         },
@@ -161,13 +209,16 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "var a = [1,  2,  3,  4]",
             output: "var a = [1, 2, 3, 4]",
             errors: [{
-                message: "Multiple spaces found before '2'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "2" },
                 type: "Numeric"
             }, {
-                message: "Multiple spaces found before '3'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "3" },
                 type: "Numeric"
             }, {
-                message: "Multiple spaces found before '4'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "4" },
                 type: "Numeric"
             }]
         },
@@ -175,7 +226,8 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "var arr = [1,  2];",
             output: "var arr = [1, 2];",
             errors: [{
-                message: "Multiple spaces found before '2'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "2" },
                 type: "Numeric"
             }]
         },
@@ -183,24 +235,37 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "[  , 1,  , 3,  ,  ]",
             output: "[ , 1, , 3, , ]",
             errors: [{
-                message: "Multiple spaces found before ','.",
-                type: "Punctuator"
+                messageId: "multipleSpaces",
+                data: { displayValue: "," },
+                type: "Punctuator",
+                column: 2,
+                endColumn: 4
             }, {
-                message: "Multiple spaces found before ','.",
-                type: "Punctuator"
+                messageId: "multipleSpaces",
+                data: { displayValue: "," },
+                type: "Punctuator",
+                column: 8,
+                endColumn: 10
             }, {
-                message: "Multiple spaces found before ','.",
-                type: "Punctuator"
+                messageId: "multipleSpaces",
+                data: { displayValue: "," },
+                type: "Punctuator",
+                column: 14,
+                endColumn: 16
             }, {
-                message: "Multiple spaces found before ']'.",
-                type: "Punctuator"
+                messageId: "multipleSpaces",
+                data: { displayValue: "]" },
+                type: "Punctuator",
+                column: 17,
+                endColumn: 19
             }]
         },
         {
             code: "a >>>  b",
             output: "a >>> b",
             errors: [{
-                message: "Multiple spaces found before 'b'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "b" },
                 type: "Identifier"
             }]
         },
@@ -208,10 +273,12 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "a = 1,  b =  2;",
             output: "a = 1, b = 2;",
             errors: [{
-                message: "Multiple spaces found before 'b'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "b" },
                 type: "Identifier"
             }, {
-                message: "Multiple spaces found before '2'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "2" },
                 type: "Numeric"
             }]
         },
@@ -219,7 +286,8 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "(function(a,  b){})",
             output: "(function(a, b){})",
             errors: [{
-                message: "Multiple spaces found before 'b'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "b" },
                 type: "Identifier"
             }]
         },
@@ -227,7 +295,8 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "function foo(a,  b){}",
             output: "function foo(a, b){}",
             errors: [{
-                message: "Multiple spaces found before 'b'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "b" },
                 type: "Identifier"
             }]
         },
@@ -235,15 +304,8 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "var o = { fetch: function    () {} };",
             output: "var o = { fetch: function () {} };",
             errors: [{
-                message: "Multiple spaces found before '('.",
-                type: "Punctuator"
-            }]
-        },
-        {
-            code: "var o = { fetch: function    () {} };",
-            output: "var o = { fetch: function () {} };",
-            errors: [{
-                message: "Multiple spaces found before '('.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "(" },
                 type: "Punctuator"
             }]
         },
@@ -251,15 +313,19 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "function foo      () {}",
             output: "function foo () {}",
             errors: [{
-                message: "Multiple spaces found before '('.",
-                type: "Punctuator"
+                messageId: "multipleSpaces",
+                data: { displayValue: "(" },
+                type: "Punctuator",
+                column: 13,
+                endColumn: 19
             }]
         },
         {
             code: "if (foo)      {}",
             output: "if (foo) {}",
             errors: [{
-                message: "Multiple spaces found before '{'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "{" },
                 type: "Punctuator"
             }]
         },
@@ -267,7 +333,8 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "function    foo(){}",
             output: "function foo(){}",
             errors: [{
-                message: "Multiple spaces found before 'foo'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "foo" },
                 type: "Identifier"
             }]
         },
@@ -275,7 +342,8 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "if    (foo) {}",
             output: "if (foo) {}",
             errors: [{
-                message: "Multiple spaces found before '('.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "(" },
                 type: "Punctuator"
             }]
         },
@@ -283,7 +351,8 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "try    {} catch(ex) {}",
             output: "try {} catch(ex) {}",
             errors: [{
-                message: "Multiple spaces found before '{'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "{" },
                 type: "Punctuator"
             }]
         },
@@ -291,15 +360,8 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "try {} catch    (ex) {}",
             output: "try {} catch (ex) {}",
             errors: [{
-                message: "Multiple spaces found before '('.",
-                type: "Punctuator"
-            }]
-        },
-        {
-            code: "var o = { fetch: function    () {} };",
-            output: "var o = { fetch: function () {} };",
-            errors: [{
-                message: "Multiple spaces found before '('.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "(" },
                 type: "Punctuator"
             }]
         },
@@ -307,7 +369,8 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "throw  error;",
             output: "throw error;",
             errors: [{
-                message: "Multiple spaces found before 'error'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "error" },
                 type: "Identifier"
             }]
         },
@@ -315,7 +378,8 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "function foo() { return      bar; }",
             output: "function foo() { return bar; }",
             errors: [{
-                message: "Multiple spaces found before 'bar'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "bar" },
                 type: "Identifier"
             }]
         },
@@ -323,7 +387,8 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "switch   (a) {default: foo(); break;}",
             output: "switch (a) {default: foo(); break;}",
             errors: [{
-                message: "Multiple spaces found before '('.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "(" },
                 type: "Punctuator"
             }]
         },
@@ -331,19 +396,21 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "var  answer = 6 *  7;",
             output: "var answer = 6 * 7;",
             errors: [{
-                message: "Multiple spaces found before 'answer'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "answer" },
                 type: "Identifier"
             }, {
-                message: "Multiple spaces found before '7'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "7" },
                 type: "Numeric"
             }]
         },
         {
             code: "({ a:  6  * 7 })",
             output: "({ a:  6 * 7 })",
-            args: 2,
             errors: [{
-                message: "Multiple spaces found before '*'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "*" },
                 type: "Punctuator"
             }]
         },
@@ -352,7 +419,8 @@ ruleTester.run("no-multi-spaces", rule, {
             output: "({ a: b })",
             options: [{ exceptions: { Property: false } }],
             errors: [{
-                message: "Multiple spaces found before 'b'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "b" },
                 type: "Identifier"
             }]
         },
@@ -360,7 +428,8 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "var foo = { bar: function() { return 1    + 2; } };",
             output: "var foo = { bar: function() { return 1 + 2; } };",
             errors: [{
-                message: "Multiple spaces found before '+'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "+" },
                 type: "Punctuator"
             }]
         },
@@ -368,7 +437,8 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "\t\tvar x = 5,\n\t\t    y =  2;",
             output: "\t\tvar x = 5,\n\t\t    y = 2;",
             errors: [{
-                message: "Multiple spaces found before '2'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "2" },
                 type: "Numeric"
             }]
         },
@@ -376,8 +446,239 @@ ruleTester.run("no-multi-spaces", rule, {
             code: "var x =\t  5;",
             output: "var x = 5;",
             errors: [{
-                message: "Multiple spaces found before '5'.",
+                messageId: "multipleSpaces",
+                data: { displayValue: "5" },
+                type: "Numeric",
+                column: 8,
+                endColumn: 11
+            }]
+        },
+
+        // https://github.com/eslint/eslint/issues/7693
+        {
+            code: "var x =  /* comment */ 5;",
+            output: "var x = /* comment */ 5;",
+            errors: [{
+                messageId: "multipleSpaces",
+                data: { displayValue: "/* comment */" },
+                type: "Block"
+            }]
+        },
+        {
+            code: "var x = /* comment */  5;",
+            output: "var x = /* comment */ 5;",
+            errors: [{
+                messageId: "multipleSpaces",
+                data: { displayValue: "5" },
                 type: "Numeric"
+            }]
+        },
+        {
+            code: "var x = 5;  // comment",
+            output: "var x = 5; // comment",
+            errors: [{
+                messageId: "multipleSpaces",
+                data: { displayValue: "// comment" },
+                type: "Line",
+                column: 11,
+                endColumn: 13
+            }]
+        },
+        {
+            code: "var x = 5;  // comment\nvar y = 6;",
+            output: "var x = 5; // comment\nvar y = 6;",
+            errors: [{
+                messageId: "multipleSpaces",
+                data: { displayValue: "// comment" },
+                type: "Line"
+            }]
+        },
+        {
+            code: "var x = 5;  /* multiline\n * comment\n */",
+            output: "var x = 5; /* multiline\n * comment\n */",
+            errors: [{
+                messageId: "multipleSpaces",
+                data: { displayValue: "/* multiline...*/" },
+                type: "Block"
+            }]
+        },
+        {
+            code: "var x = 5;  /* multiline\n * comment\n */\nvar y = 6;",
+            output: "var x = 5; /* multiline\n * comment\n */\nvar y = 6;",
+            errors: [{
+                messageId: "multipleSpaces",
+                data: { displayValue: "/* multiline...*/" },
+                type: "Block"
+            }]
+        },
+        {
+            code: "var x = 5;  // this is a long comment",
+            output: "var x = 5; // this is a long comment",
+            errors: [{
+                messageId: "multipleSpaces",
+                data: { displayValue: "// this is a l..." },
+                type: "Line"
+            }]
+        },
+        {
+            code: "var x =  /* comment */ 5;",
+            output: "var x = /* comment */ 5;",
+            options: [{ ignoreEOLComments: false }],
+            errors: [{
+                messageId: "multipleSpaces",
+                data: { displayValue: "/* comment */" },
+                type: "Block"
+            }]
+        },
+        {
+            code: "var x = /* comment */  5;",
+            output: "var x = /* comment */ 5;",
+            options: [{ ignoreEOLComments: false }],
+            errors: [{
+                messageId: "multipleSpaces",
+                data: { displayValue: "5" },
+                type: "Numeric"
+            }]
+        },
+        {
+            code: "var x = 5;  // comment",
+            output: "var x = 5; // comment",
+            options: [{ ignoreEOLComments: false }],
+            errors: [{
+                messageId: "multipleSpaces",
+                data: { displayValue: "// comment" },
+                type: "Line"
+            }]
+        },
+        {
+            code: "var x = 5;  // comment\nvar y = 6;",
+            output: "var x = 5; // comment\nvar y = 6;",
+            options: [{ ignoreEOLComments: false }],
+            errors: [{
+                messageId: "multipleSpaces",
+                data: { displayValue: "// comment" },
+                type: "Line"
+            }]
+        },
+        {
+            code: "var x = 5;  /* multiline\n * comment\n */",
+            output: "var x = 5; /* multiline\n * comment\n */",
+            options: [{ ignoreEOLComments: false }],
+            errors: [{
+                messageId: "multipleSpaces",
+                data: { displayValue: "/* multiline...*/" },
+                type: "Block"
+            }]
+        },
+        {
+            code: "var x = 5;  /* multiline\n * comment\n */\nvar y = 6;",
+            output: "var x = 5; /* multiline\n * comment\n */\nvar y = 6;",
+            options: [{ ignoreEOLComments: false }],
+            errors: [{
+                messageId: "multipleSpaces",
+                data: { displayValue: "/* multiline...*/" },
+                type: "Block"
+            }]
+        },
+        {
+            code: "var x = 5;  // this is a long comment",
+            output: "var x = 5; // this is a long comment",
+            options: [{ ignoreEOLComments: false }],
+            errors: [{
+                messageId: "multipleSpaces",
+                data: { displayValue: "// this is a l..." },
+                type: "Line"
+            }]
+        },
+        {
+            code: "var x =  /* comment */ 5;  // EOL comment",
+            output: "var x = /* comment */ 5;  // EOL comment",
+            options: [{ ignoreEOLComments: true }],
+            errors: [{
+                messageId: "multipleSpaces",
+                data: { displayValue: "/* comment */" },
+                type: "Block"
+            }]
+        },
+        {
+            code: "var x =  /* comment */ 5;  // EOL comment\nvar y = 6;",
+            output: "var x = /* comment */ 5;  // EOL comment\nvar y = 6;",
+            options: [{ ignoreEOLComments: true }],
+            errors: [{
+                messageId: "multipleSpaces",
+                data: { displayValue: "/* comment */" },
+                type: "Block"
+            }]
+        },
+        {
+            code: "var x = /* comment */  5;  /* EOL comment */",
+            output: "var x = /* comment */ 5;  /* EOL comment */",
+            options: [{ ignoreEOLComments: true }],
+            errors: [{
+                messageId: "multipleSpaces",
+                data: { displayValue: "5" },
+                type: "Numeric"
+            }]
+        },
+        {
+            code: "var x = /* comment */  5;  /* EOL comment */\nvar y = 6;",
+            output: "var x = /* comment */ 5;  /* EOL comment */\nvar y = 6;",
+            options: [{ ignoreEOLComments: true }],
+            errors: [{
+                messageId: "multipleSpaces",
+                data: { displayValue: "5" },
+                type: "Numeric"
+            }]
+        },
+        {
+            code: "var x =  /*comment without spaces*/ 5;",
+            output: "var x = /*comment without spaces*/ 5;",
+            options: [{ ignoreEOLComments: true }],
+            errors: [{
+                messageId: "multipleSpaces",
+                data: { displayValue: "/*comment with...*/" },
+                type: "Block"
+            }]
+        },
+        {
+            code: "var x = 5;  //comment without spaces",
+            output: "var x = 5; //comment without spaces",
+            options: [{ ignoreEOLComments: false }],
+            errors: [{
+                messageId: "multipleSpaces",
+                data: { displayValue: "//comment with..." },
+                type: "Line"
+            }]
+        },
+        {
+            code: "var x = 5;  /*comment without spaces*/",
+            output: "var x = 5; /*comment without spaces*/",
+            options: [{ ignoreEOLComments: false }],
+            errors: [{
+                messageId: "multipleSpaces",
+                data: { displayValue: "/*comment with...*/" },
+                type: "Block"
+            }]
+        },
+        {
+            code: "var x = 5;  /*comment\n without spaces*/",
+            output: "var x = 5; /*comment\n without spaces*/",
+            options: [{ ignoreEOLComments: false }],
+            errors: [{
+                messageId: "multipleSpaces",
+                data: { displayValue: "/*comment...*/" },
+                type: "Block",
+                column: 11,
+                endColumn: 13
+            }]
+        },
+        {
+            code: "foo\n\f  bar  + baz",
+            output: "foo\n\f  bar + baz",
+            errors: [{
+                messageId: "multipleSpaces",
+                data: { displayValue: "+" },
+                type: "Punctuator"
             }]
         }
     ]

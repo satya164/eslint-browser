@@ -60,9 +60,18 @@ switch ((val = foo(), val)) {}
 
 while ((val = foo(), val < 42));
 
-// with ((doSomething(), val)) {}
+with ((doSomething(), val)) {}
 ```
 
 ## When Not To Use It
 
 Disable this rule if sequence expressions with the comma operator are acceptable.
+Another case is where you might want to report all usages of the comma operator, even if they are wrapped in parentheses or in a for loop. You can achieve this using rule `no-restricted-syntax`:
+
+```js
+{
+    "rules": {
+        "no-restricted-syntax": ["error", "SequenceExpression"]
+    }
+}
+```

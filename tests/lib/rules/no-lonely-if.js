@@ -9,14 +9,14 @@
 //------------------------------------------------------------------------------
 
 const rule = require("../../../lib/rules/no-lonely-if"),
-    RuleTester = require("../../../lib/testers/rule-tester");
+    { RuleTester } = require("../../../lib/rule-tester");
 
 //------------------------------------------------------------------------------
 // Tests
 //------------------------------------------------------------------------------
 
 const ruleTester = new RuleTester();
-const errors = [{ message: "Unexpected if as the only statement in an else block.", type: "IfStatement" }];
+const errors = [{ messageId: "unexpectedLonelyIf", type: "IfStatement" }];
 
 ruleTester.run("no-lonely-if", rule, {
 
@@ -76,14 +76,7 @@ ruleTester.run("no-lonely-if", rule, {
             "    bar();\n" +
             "  }\n" +
             "}",
-            output: // Not fixed, comment interferes
-            "if (a) {\n" +
-            "  foo();\n" +
-            "} else {\n" +
-            "  /* otherwise, do the other thing */ if (b) {\n" +
-            "    bar();\n" +
-            "  }\n" +
-            "}",
+            output: null,
             errors
         },
         {
@@ -112,14 +105,7 @@ ruleTester.run("no-lonely-if", rule, {
             "    bar();\n" +
             "  } /* this comment will prevent this test case from being autofixed. */\n" +
             "}",
-            output:
-            "if (a) {\n" +
-            "  foo();\n" +
-            "} else {\n" +
-            "  if (b) {\n" +
-            "    bar();\n" +
-            "  } /* this comment will prevent this test case from being autofixed. */\n" +
-            "}",
+            output: null,
             errors
         },
         {
@@ -131,7 +117,7 @@ ruleTester.run("no-lonely-if", rule, {
 
             // Not fixed; removing the braces would cause a SyntaxError.
             code: "if (foo) {} else { if (bar) baz() } qux();",
-            output: "if (foo) {} else { if (bar) baz() } qux();",
+            output: null,
             errors
         },
         {
@@ -150,12 +136,7 @@ ruleTester.run("no-lonely-if", rule, {
             "  if (bar) baz()\n" +
             "}\n" +
             "[1, 2, 3].forEach(foo);",
-            output:
-            "if (foo) {\n" +
-            "} else {\n" +
-            "  if (bar) baz()\n" +
-            "}\n" +
-            "[1, 2, 3].forEach(foo);",
+            output: null,
             errors
         },
         {
@@ -167,12 +148,7 @@ ruleTester.run("no-lonely-if", rule, {
             "  if (bar) baz++\n" +
             "}\n" +
             "foo;",
-            output:
-            "if (foo) {\n" +
-            "} else {\n" +
-            "  if (bar) baz++\n" +
-            "}\n" +
-            "foo;",
+            output: null,
             errors
         },
         {
@@ -200,13 +176,7 @@ ruleTester.run("no-lonely-if", rule, {
             "  if (b) bar()\n" +
             "}\n" +
             "`template literal`;",
-            output:
-            "if (a) {\n" +
-            "  foo();\n" +
-            "} else {\n" +
-            "  if (b) bar()\n" +
-            "}\n" +
-            "`template literal`;",
+            output: null,
             parserOptions: { ecmaVersion: 6 },
             errors
         },

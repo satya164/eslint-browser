@@ -1,4 +1,13 @@
 "use strict";
+const os = require("os");
+
+if (os.arch() === "arm64") {
+
+    // For arm64 architecture, install chromium-browser using "apt-get install chromium-browser"
+    process.env.CHROME_BIN = "/usr/bin/chromium-browser";
+} else {
+    process.env.CHROME_BIN = require("puppeteer").executablePath();
+}
 
 module.exports = function(config) {
     config.set({
@@ -7,18 +16,17 @@ module.exports = function(config) {
         basePath: "",
 
 
-        // frameworks to use
-        // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
+        /*
+         * frameworks to use
+         * available frameworks: https://npmjs.org/browse/keyword/karma-adapter
+         */
         frameworks: ["mocha"],
 
 
         // list of files / patterns to load in the browser
         files: [
-            "node_modules/mocha/mocha.js",
-            "node_modules/chai/chai.js",
-            "node_modules/sinon/pkg/sinon.js",
             "build/eslint.js",
-            "tests/lib/eslint.js"
+            "tests/lib/linter/linter.js"
         ],
 
 
@@ -27,21 +35,27 @@ module.exports = function(config) {
         ],
 
 
-        // preprocess matching files before serving them to the browser
-        // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
+        /*
+         * preprocess matching files before serving them to the browser
+         * available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
+         */
         preprocessors: {
-            "tests/lib/eslint.js": ["babel"]
+            "tests/lib/linter/linter.js": ["webpack"]
         },
-        babelPreprocessor: {
-            options: {
-                presets: ["es2015"]
-            }
+        webpack: {
+            mode: "none",
+            stats: "errors-only"
+        },
+        webpackMiddleware: {
+            logLevel: "error"
         },
 
 
-        // test results reporter to use
-        // possible values: "dots", "progress"
-        // available reporters: https://npmjs.org/browse/keyword/karma-reporter
+        /*
+         * test results reporter to use
+         * possible values: "dots", "progress"
+         * available reporters: https://npmjs.org/browse/keyword/karma-reporter
+         */
         reporters: ["mocha"],
 
         mochaReporter: {
@@ -56,8 +70,10 @@ module.exports = function(config) {
         colors: true,
 
 
-        // level of logging
-        // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
+        /*
+         * level of logging
+         * possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
+         */
         logLevel: config.LOG_INFO,
 
 
@@ -65,17 +81,28 @@ module.exports = function(config) {
         autoWatch: false,
 
 
-        // start these browsers
-        // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-        browsers: ["PhantomJS"],
+        /*
+         * start these browsers
+         * available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
+         */
+        browsers: ["HeadlessChrome"],
+        customLaunchers: {
+            HeadlessChrome: {
+                base: "ChromeHeadless",
+                flags: ["--no-sandbox"]
+            }
+        },
 
-
-        // Continuous Integration mode
-        // if true, Karma captures browsers, runs the tests and exits
+        /*
+         * Continuous Integration mode
+         * if true, Karma captures browsers, runs the tests and exits
+         */
         singleRun: true,
 
-        // Concurrency level
-        // how many browser should be started simultaneous
+        /*
+         * Concurrency level
+         * how many browser should be started simultaneous
+         */
         concurrency: Infinity
     });
 };

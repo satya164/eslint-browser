@@ -9,10 +9,10 @@
 //------------------------------------------------------------------------------
 
 const rule = require("../../../lib/rules/nonblock-statement-body-position");
-const RuleTester = require("../../../lib/testers/rule-tester");
+const { RuleTester } = require("../../../lib/rule-tester");
 
-const EXPECTED_LINEBREAK = { message: "Expected a linebreak before this statement." };
-const UNEXPECTED_LINEBREAK = { message: "Expected no linebreak before this statement." };
+const EXPECTED_LINEBREAK = { messageId: "expectLinebreak" };
+const UNEXPECTED_LINEBREAK = { messageId: "expectNoLinebreak" };
 
 //------------------------------------------------------------------------------
 // Tests
@@ -32,6 +32,11 @@ ruleTester.run("nonblock-statement-body-position", rule, {
         "for (foo in bar) baz;",
         "for (foo of bar) baz;",
         "if (foo) bar; else baz;",
+        `
+            if (foo) bar(
+                baz
+            );
+        `,
         {
             code: "if (foo) bar();",
             options: ["beside"]

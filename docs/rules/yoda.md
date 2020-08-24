@@ -51,6 +51,14 @@ if ("red" === color) {
     // ...
 }
 
+if (`red` === color) {
+    // ...
+}
+
+if (`red` === `${color}`) {
+    // ...
+}
+
 if (true == flag) {
     // ...
 }
@@ -80,6 +88,14 @@ if (5 & value) {
 if (value === "red") {
     // ...
 }
+
+if (value === `red`) {
+    // ...
+}
+
+if (`${value}` === `red`) {
+
+}
 ```
 
 ### exceptRange
@@ -101,6 +117,10 @@ if (count < 10 && (0 <= rand && rand < 1)) {
     // ...
 }
 
+if (`blue` < x && x < `green`) {
+    // ...
+}
+
 function howLong(arr) {
     return (0 <= arr.length && arr.length < 10) ? "short" : "long";
 }
@@ -118,6 +138,9 @@ if (x < -1 || 9 < x) {
 
 if (x !== 'foo' && 'bar' != x) {
 }
+
+if (x !== `foo` && `bar` != x) {
+}
 ```
 
 ### always
@@ -128,6 +151,10 @@ Examples of **incorrect** code for the `"always"` option:
 /*eslint yoda: ["error", "always"]*/
 
 if (color == "blue") {
+    // ...
+}
+
+if (color == `blue`) {
     // ...
 }
 ```
@@ -141,6 +168,14 @@ if ("blue" == value) {
     // ...
 }
 
+if (`blue` == value) {
+    // ...
+}
+
+if (`blue` == `${value}`) {
+    // ...
+}
+
 if (-1 < str.indexOf(substr)) {
     // ...
 }
@@ -148,5 +183,5 @@ if (-1 < str.indexOf(substr)) {
 
 ## Further Reading
 
-* [Yoda Conditions](http://en.wikipedia.org/wiki/Yoda_conditions)
+* [Yoda Conditions](https://en.wikipedia.org/wiki/Yoda_conditions)
 * [Yoda Notation and Safe Switching](http://thomas.tuerke.net/on/design/?with=1249091668#msg1146181680)

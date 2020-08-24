@@ -2,7 +2,7 @@
 
 An unused expression which has no effect on the state of the program indicates a logic error.
 
-For example, `n + 1;` is not a syntax error, but it might be a typing mistake where a programmer meant an assignment statement `n += 1;` instead.
+For example, `n + 1;` is not a syntax error, but it might be a typing mistake where a programmer meant an assignment statement `n += 1;` instead. Sometimes, such unused expressions may be eliminated by some build tools in production environment, which possibly breaks application logic.
 
 ## Rule Details
 
@@ -29,7 +29,8 @@ Sequence expressions (those using a comma, such as `a = 1, b = 2`) are always co
 This rule, in its default state, does not require any arguments. If you would like to enable one or more of the following you may pass an object with the options set as follows:
 
 * `allowShortCircuit` set to `true` will allow you to use short circuit evaluations in your expressions (Default: `false`).
-* `allowTernary` set to `true` will enable you use ternary operators in your expressions similarly to short circuit evaluations (Default: `false`).
+* `allowTernary` set to `true` will enable you to use ternary operators in your expressions similarly to short circuit evaluations (Default: `false`).
+* `allowTaggedTemplates` set to `true` will enable you to use tagged template literals in your expressions (Default: `false`).
 
 These options allow unused expressions *only if all* of the code paths either directly change the state (for example, assignment statement) or could have *side effects* (for example, function call).
 
@@ -55,6 +56,8 @@ c = a, b;
 a() && function namedFunctionInExpressionContext () {f();}
 
 (function anIncompleteIIFE () {});
+
+injectGlobal`body{ color: red; }`
 
 ```
 
@@ -139,4 +142,22 @@ Examples of **correct** code for the `{ "allowShortCircuit": true, "allowTernary
 /*eslint no-unused-expressions: ["error", { "allowShortCircuit": true, "allowTernary": true }]*/
 
 a ? b() || (c = d) : e()
+```
+
+### allowTaggedTemplates
+
+Examples of **incorrect** code for the `{ "allowTaggedTemplates": true }` option:
+
+```js
+/*eslint no-unused-expressions: ["error", { "allowTaggedTemplates": true }]*/
+
+`some untagged template string`;
+```
+
+Examples of **correct** code for the `{ "allowTaggedTemplates": true }` option:
+
+```js
+/*eslint no-unused-expressions: ["error", { "allowTaggedTemplates": true }]*/
+
+tag`some tagged template string`;
 ```

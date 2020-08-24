@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 
 const rule = require("../../../lib/rules/no-this-before-super");
-const RuleTester = require("../../../lib/testers/rule-tester");
+const { RuleTester } = require("../../../lib/rule-tester");
 
 //------------------------------------------------------------------------------
 // Tests
@@ -65,88 +65,102 @@ ruleTester.run("no-this-before-super", rule, {
         "class A extends B { constructor(a) { super(); this.a = a && function(){} && this.foo; } }",
 
         // https://github.com/eslint/eslint/issues/5394
-        {
-            code: [
-                "class A extends Object {",
-                "    constructor() {",
-                "        super();",
-                "        for (let i = 0; i < 0; i++);",
-                "        this;",
-                "    }",
-                "}"
-            ].join("\n")
-        },
+        [
+            "class A extends Object {",
+            "    constructor() {",
+            "        super();",
+            "        for (let i = 0; i < 0; i++);",
+            "        this;",
+            "    }",
+            "}"
+        ].join("\n"),
 
         // https://github.com/eslint/eslint/issues/5894
         "class A { constructor() { return; this; } }",
-        "class A extends B { constructor() { return; this; } }"
+        "class A extends B { constructor() { return; this; } }",
+
+        // https://github.com/eslint/eslint/issues/8848
+        `
+            class A extends B {
+                constructor(props) {
+                    super(props);
+
+                    try {
+                        let arr = [];
+                        for (let a of arr) {
+                        }
+                    } catch (err) {
+                    }
+                }
+            }
+        `
     ],
     invalid: [
 
         // disallows all `this`/`super` if `super()` is missing.
         {
             code: "class A extends B { constructor() { this.c = 0; } }",
-            errors: [{ message: "'this' is not allowed before 'super()'.", type: "ThisExpression" }]
+            errors: [{ messageId: "noBeforeSuper", data: { kind: "this" }, type: "ThisExpression" }]
         },
         {
             code: "class A extends B { constructor() { this.c(); } }",
-            errors: [{ message: "'this' is not allowed before 'super()'.", type: "ThisExpression" }]
+            errors: [{ messageId: "noBeforeSuper", data: { kind: "this" }, type: "ThisExpression" }]
         },
         {
             code: "class A extends B { constructor() { super.c(); } }",
-            errors: [{ message: "'super' is not allowed before 'super()'.", type: "Super" }]
+            errors: [{ messageId: "noBeforeSuper", data: { kind: "super" }, type: "Super" }]
         },
 
         // disallows `this`/`super` before `super()`.
         {
             code: "class A extends B { constructor() { this.c = 0; super(); } }",
-            errors: [{ message: "'this' is not allowed before 'super()'.", type: "ThisExpression" }]
+            errors: [{ messageId: "noBeforeSuper", data: { kind: "this" }, type: "ThisExpression" }]
         },
         {
             code: "class A extends B { constructor() { this.c(); super(); } }",
-            errors: [{ message: "'this' is not allowed before 'super()'.", type: "ThisExpression" }]
+            errors: [{ messageId: "noBeforeSuper", data: { kind: "this" }, type: "ThisExpression" }]
         },
         {
             code: "class A extends B { constructor() { super.c(); super(); } }",
-            errors: [{ message: "'super' is not allowed before 'super()'.", type: "Super" }]
+            errors: [{ messageId: "noBeforeSuper", data: { kind: "super" }, type: "Super" }]
         },
 
         // disallows `this`/`super` in arguments of `super()`.
         {
             code: "class A extends B { constructor() { super(this.c); } }",
-            errors: [{ message: "'this' is not allowed before 'super()'.", type: "ThisExpression" }]
+            errors: [{ messageId: "noBeforeSuper", data: { kind: "this" }, type: "ThisExpression" }]
         },
         {
             code: "class A extends B { constructor() { super(this.c()); } }",
-            errors: [{ message: "'this' is not allowed before 'super()'.", type: "ThisExpression" }]
+            errors: [{ messageId: "noBeforeSuper", data: { kind: "this" }, type: "ThisExpression" }]
         },
         {
             code: "class A extends B { constructor() { super(super.c()); } }",
-            errors: [{ message: "'super' is not allowed before 'super()'.", type: "Super" }]
+            errors: [{ messageId: "noBeforeSuper", data: { kind: "super" }, type: "Super" }]
         },
 
         // even if is nested, reports correctly.
         {
             code: "class A extends B { constructor() { class C extends D { constructor() { super(); this.e(); } } this.f(); super(); } }",
-            errors: [{ message: "'this' is not allowed before 'super()'.", type: "ThisExpression", column: 96 }]
+            errors: [{ messageId: "noBeforeSuper", data: { kind: "this" }, type: "ThisExpression", column: 96 }]
         },
         {
             code: "class A extends B { constructor() { class C extends D { constructor() { this.e(); super(); } } super(); this.f(); } }",
-            errors: [{ message: "'this' is not allowed before 'super()'.", type: "ThisExpression", column: 73 }]
+            errors: [{ messageId: "noBeforeSuper", data: { kind: "this" }, type: "ThisExpression", column: 73 }]
         },
 
         // multi code path.
         {
             code: "class A extends B { constructor() { if (a) super(); this.a(); } }",
-            errors: [{ message: "'this' is not allowed before 'super()'.", type: "ThisExpression" }]
+            errors: [{ messageId: "noBeforeSuper", data: { kind: "this" }, type: "ThisExpression" }]
         },
         {
             code: "class A extends B { constructor() { try { super(); } finally { this.a; } } }",
-            errors: [{ message: "'this' is not allowed before 'super()'.", type: "ThisExpression" }]
+            errors: [{ messageId: "noBeforeSuper", data: { kind: "this" }, type: "ThisExpression" }]
         },
         {
             code: "class A extends B { constructor() { try { super(); } catch (err) { } this.a; } }",
-            errors: [{ message: "'this' is not allowed before 'super()'.", type: "ThisExpression" }]
+            errors: [{ messageId: "noBeforeSuper", data: { kind: "this" }, type: "ThisExpression" }]
         }
     ]
 });

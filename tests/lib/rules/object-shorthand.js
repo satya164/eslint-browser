@@ -10,21 +10,22 @@
 //------------------------------------------------------------------------------
 
 const rule = require("../../../lib/rules/object-shorthand"),
-    RuleTester = require("../../../lib/testers/rule-tester");
+    { RuleTester } = require("../../../lib/rule-tester");
+const { unIndent } = require("../../_utils");
 
 //------------------------------------------------------------------------------
 // Tests
 //------------------------------------------------------------------------------
 
-const PROPERTY_ERROR = { message: "Expected property shorthand.", type: "Property" };
-const METHOD_ERROR = { message: "Expected method shorthand.", type: "Property" };
-const LONGFORM_PROPERTY_ERROR = { message: "Expected longform property syntax.", type: "Property" };
-const LONGFORM_METHOD_ERROR = { message: "Expected longform method syntax.", type: "Property" };
-const LONGFORM_METHOD_STRING_LITERAL_ERROR = { message: "Expected longform method syntax for string literal keys.", type: "Property" };
-const ALL_SHORTHAND_ERROR = { message: "Expected shorthand for all properties.", type: "ObjectExpression" };
-const MIXED_SHORTHAND_ERROR = { message: "Unexpected mix of shorthand and non-shorthand properties.", type: "ObjectExpression" };
+const PROPERTY_ERROR = { messageId: "expectedPropertyShorthand", type: "Property" };
+const METHOD_ERROR = { messageId: "expectedMethodShorthand", type: "Property" };
+const LONGFORM_PROPERTY_ERROR = { messageId: "expectedPropertyLongform", type: "Property" };
+const LONGFORM_METHOD_ERROR = { messageId: "expectedMethodLongform", type: "Property" };
+const LONGFORM_METHOD_STRING_LITERAL_ERROR = { messageId: "expectedLiteralMethodLongform", type: "Property" };
+const ALL_SHORTHAND_ERROR = { messageId: "expectedAllPropertiesShorthanded", type: "ObjectExpression" };
+const MIXED_SHORTHAND_ERROR = { messageId: "unexpectedMix", type: "ObjectExpression" };
 
-const ruleTester = new RuleTester({ parserOptions: { ecmaVersion: 6 } });
+const ruleTester = new RuleTester({ parserOptions: { ecmaVersion: 2018 } });
 
 ruleTester.run("object-shorthand", rule, {
     valid: [
@@ -132,11 +133,43 @@ ruleTester.run("object-shorthand", rule, {
             options: ["always", { ignoreConstructors: true }]
         },
         {
+            code: "var x = {_ConstructorFunction: function(){}, a: b}",
+            options: ["always", { ignoreConstructors: true }]
+        },
+        {
+            code: "var x = {$ConstructorFunction: function(){}, a: b}",
+            options: ["always", { ignoreConstructors: true }]
+        },
+        {
+            code: "var x = {__ConstructorFunction: function(){}, a: b}",
+            options: ["always", { ignoreConstructors: true }]
+        },
+        {
+            code: "var x = {_0ConstructorFunction: function(){}, a: b}",
+            options: ["always", { ignoreConstructors: true }]
+        },
+        {
             code: "var x = {notConstructorFunction(){}, b: c}",
             options: ["always", { ignoreConstructors: true }]
         },
         {
             code: "var x = {ConstructorFunction: function(){}, a: b}",
+            options: ["methods", { ignoreConstructors: true }]
+        },
+        {
+            code: "var x = {_ConstructorFunction: function(){}, a: b}",
+            options: ["methods", { ignoreConstructors: true }]
+        },
+        {
+            code: "var x = {$ConstructorFunction: function(){}, a: b}",
+            options: ["methods", { ignoreConstructors: true }]
+        },
+        {
+            code: "var x = {__ConstructorFunction: function(){}, a: b}",
+            options: ["methods", { ignoreConstructors: true }]
+        },
+        {
+            code: "var x = {_0ConstructorFunction: function(){}, a: b}",
             options: ["methods", { ignoreConstructors: true }]
         },
         {
@@ -173,8 +206,8 @@ ruleTester.run("object-shorthand", rule, {
         },
         {
             code: "var x = {foo: foo, bar: bar, ...baz}",
-            parserOptions: { ecmaFeatures: { experimentalObjectRestSpread: true } },
-            options: ["never"]
+            options: ["never"],
+            parserOptions: { ecmaVersion: 2018 }
         },
 
         // consistent
@@ -196,23 +229,23 @@ ruleTester.run("object-shorthand", rule, {
         },
         {
             code: "var x = {...bar}",
-            parserOptions: { ecmaFeatures: { experimentalObjectRestSpread: true } },
-            options: ["consistent-as-needed"]
+            options: ["consistent-as-needed"],
+            parserOptions: { ecmaVersion: 2018 }
         },
         {
             code: "var x = {foo, bar, ...baz}",
-            parserOptions: { ecmaFeatures: { experimentalObjectRestSpread: true } },
-            options: ["consistent"]
+            options: ["consistent"],
+            parserOptions: { ecmaVersion: 2018 }
         },
         {
             code: "var x = {bar: baz, ...qux}",
-            parserOptions: { ecmaFeatures: { experimentalObjectRestSpread: true } },
-            options: ["consistent"]
+            options: ["consistent"],
+            parserOptions: { ecmaVersion: 2018 }
         },
         {
             code: "var x = {...foo, bar: bar, baz: baz}",
-            parserOptions: { ecmaFeatures: { experimentalObjectRestSpread: true } },
-            options: ["consistent"]
+            options: ["consistent"],
+            parserOptions: { ecmaVersion: 2018 }
         },
 
         // consistent-as-needed
@@ -249,24 +282,19 @@ ruleTester.run("object-shorthand", rule, {
             options: ["consistent-as-needed"]
         },
         {
-            code: "var x = {...bar}",
-            parserOptions: { ecmaFeatures: { experimentalObjectRestSpread: true } },
-            options: ["consistent-as-needed"]
-        },
-        {
             code: "var x = {bar, ...baz}",
-            parserOptions: { ecmaFeatures: { experimentalObjectRestSpread: true } },
-            options: ["consistent-as-needed"]
+            options: ["consistent-as-needed"],
+            parserOptions: { ecmaVersion: 2018 }
         },
         {
             code: "var x = {bar: baz, ...qux}",
-            parserOptions: { ecmaFeatures: { experimentalObjectRestSpread: true } },
-            options: ["consistent-as-needed"]
+            options: ["consistent-as-needed"],
+            parserOptions: { ecmaVersion: 2018 }
         },
         {
             code: "var x = {...foo, bar, baz}",
-            parserOptions: { ecmaFeatures: { experimentalObjectRestSpread: true } },
-            options: ["consistent-as-needed"]
+            options: ["consistent-as-needed"],
+            parserOptions: { ecmaVersion: 2018 }
         },
 
         // avoidExplicitReturnArrows
@@ -300,10 +328,6 @@ ruleTester.run("object-shorthand", rule, {
         },
         {
             code: "({ x: () => { this; } })",
-            options: ["always", { avoidExplicitReturnArrows: true }]
-        },
-        {
-            code: "function foo() { ({ x: () => { arguments; } }) }",
             options: ["always", { avoidExplicitReturnArrows: true }]
         },
         {
@@ -374,6 +398,10 @@ ruleTester.run("object-shorthand", rule, {
                 }
             `,
             options: ["always", { avoidExplicitReturnArrows: true }]
+        },
+        {
+            code: "({ [foo.bar]: () => {} })",
+            options: ["always", { ignoreConstructors: true }]
         }
     ],
     invalid: [
@@ -430,6 +458,16 @@ ruleTester.run("object-shorthand", rule, {
         {
             code: "var x = {\n  f: function*() {\n    /* comment */\n    a(b);\n    }\n  }",
             output: "var x = {\n  *f() {\n    /* comment */\n    a(b);\n    }\n  }",
+            errors: [METHOD_ERROR]
+        },
+        {
+            code: "var x = {\n  f: /* comment */ function() {\n  }\n  }",
+            output: null,
+            errors: [METHOD_ERROR]
+        },
+        {
+            code: "var x = {\n f /* comment */: function() {\n  }\n  }",
+            output: null,
             errors: [METHOD_ERROR]
         },
         {
@@ -691,16 +729,56 @@ ruleTester.run("object-shorthand", rule, {
         {
             code: "var x = {foo: foo, bar: baz, ...qux}",
             output: "var x = {foo, bar: baz, ...qux}",
-            parserOptions: { ecmaFeatures: { experimentalObjectRestSpread: true } },
             options: ["always"],
+            parserOptions: { ecmaVersion: 2018 },
             errors: [PROPERTY_ERROR]
         },
         {
             code: "var x = {foo, bar: baz, ...qux}",
             output: "var x = {foo: foo, bar: baz, ...qux}",
-            parserOptions: { ecmaFeatures: { experimentalObjectRestSpread: true } },
             options: ["never"],
+            parserOptions: { ecmaVersion: 2018 },
             errors: [LONGFORM_PROPERTY_ERROR]
+        },
+
+        // ignoreConstructors
+        {
+            code: "var x = {y: function() {}}",
+            output: "var x = {y() {}}",
+            options: ["methods", { ignoreConstructors: true }],
+            errors: [METHOD_ERROR]
+        },
+        {
+
+            // https://github.com/eslint/eslint/issues/11595
+            code: "var x = {_y: function() {}}",
+            output: "var x = {_y() {}}",
+            options: ["methods", { ignoreConstructors: true }],
+            errors: [METHOD_ERROR]
+        },
+        {
+
+            // https://github.com/eslint/eslint/issues/11595
+            code: "var x = {$y: function() {}}",
+            output: "var x = {$y() {}}",
+            options: ["methods", { ignoreConstructors: true }],
+            errors: [METHOD_ERROR]
+        },
+        {
+
+            // https://github.com/eslint/eslint/issues/11595
+            code: "var x = {__y: function() {}}",
+            output: "var x = {__y() {}}",
+            options: ["methods", { ignoreConstructors: true }],
+            errors: [METHOD_ERROR]
+        },
+        {
+
+            // https://github.com/eslint/eslint/issues/11595
+            code: "var x = {_0y: function() {}}",
+            output: "var x = {_0y() {}}",
+            options: ["methods", { ignoreConstructors: true }],
+            errors: [METHOD_ERROR]
         },
 
         // avoidQuotes
@@ -738,48 +816,56 @@ ruleTester.run("object-shorthand", rule, {
         // consistent
         {
             code: "var x = {a: a, b}",
+            output: null,
             options: ["consistent"],
             errors: [MIXED_SHORTHAND_ERROR]
         },
         {
             code: "var x = {b, c: d, f: g}",
+            output: null,
             options: ["consistent"],
             errors: [MIXED_SHORTHAND_ERROR]
         },
         {
             code: "var x = {foo, bar: baz, ...qux}",
-            parserOptions: { ecmaFeatures: { experimentalObjectRestSpread: true } },
+            output: null,
             options: ["consistent"],
+            parserOptions: { ecmaVersion: 2018 },
             errors: [MIXED_SHORTHAND_ERROR]
         },
 
         // consistent-as-needed
         {
             code: "var x = {a: a, b: b}",
+            output: null,
             options: ["consistent-as-needed"],
             errors: [ALL_SHORTHAND_ERROR]
         },
         {
             code: "var x = {a, z: function z(){}}",
+            output: null,
             options: ["consistent-as-needed"],
             errors: [MIXED_SHORTHAND_ERROR]
 
         },
         {
             code: "var x = {foo: function() {}}",
+            output: null,
             options: ["consistent-as-needed"],
             errors: [ALL_SHORTHAND_ERROR]
         },
         {
             code: "var x = {a: a, b: b, ...baz}",
-            parserOptions: { ecmaFeatures: { experimentalObjectRestSpread: true } },
+            output: null,
             options: ["consistent-as-needed"],
+            parserOptions: { ecmaVersion: 2018 },
             errors: [ALL_SHORTHAND_ERROR]
         },
         {
             code: "var x = {foo, bar: bar, ...qux}",
-            parserOptions: { ecmaFeatures: { experimentalObjectRestSpread: true } },
+            output: null,
             options: ["consistent-as-needed"],
+            parserOptions: { ecmaVersion: 2018 },
             errors: [MIXED_SHORTHAND_ERROR]
         },
 
@@ -919,6 +1005,14 @@ ruleTester.run("object-shorthand", rule, {
             errors: [METHOD_ERROR]
         },
         {
+
+            // https://github.com/eslint/eslint/issues/11305
+            code: "({ key: (arg = () => {}) => {} })",
+            output: "({ key(arg = () => {}) {} })",
+            options: ["always", { avoidExplicitReturnArrows: true }],
+            errors: [METHOD_ERROR]
+        },
+        {
             code: `
                 function foo() {
                     var x = {
@@ -965,6 +1059,122 @@ ruleTester.run("object-shorthand", rule, {
             `,
             options: ["always", { avoidExplicitReturnArrows: true }],
             errors: [METHOD_ERROR]
+        },
+        {
+            code: "({ a: (function(){ return foo; }) })",
+            output: "({ a(){ return foo; } })",
+            errors: [METHOD_ERROR]
+        },
+        {
+            code: "({ a: (() => { return foo; }) })",
+            output: "({ a() { return foo; } })",
+            options: ["always", { avoidExplicitReturnArrows: true }],
+            errors: [METHOD_ERROR]
+        },
+        {
+            code: "({ a: ((arg) => { return foo; }) })",
+            output: "({ a(arg) { return foo; } })",
+            options: ["always", { avoidExplicitReturnArrows: true }],
+            errors: [METHOD_ERROR]
+        },
+        {
+            code: "({ a: ((arg, arg2) => { return foo; }) })",
+            output: "({ a(arg, arg2) { return foo; } })",
+            options: ["always", { avoidExplicitReturnArrows: true }],
+            errors: [METHOD_ERROR]
+        },
+        {
+            code: "({ a: (async () => { return foo; }) })",
+            output: "({ async a() { return foo; } })",
+            options: ["always", { avoidExplicitReturnArrows: true }],
+            errors: [METHOD_ERROR]
+        },
+        {
+            code: "({ a: (async (arg) => { return foo; }) })",
+            output: "({ async a(arg) { return foo; } })",
+            options: ["always", { avoidExplicitReturnArrows: true }],
+            errors: [METHOD_ERROR]
+        },
+        {
+            code: "({ a: (async (arg, arg2) => { return foo; }) })",
+            output: "({ async a(arg, arg2) { return foo; } })",
+            options: ["always", { avoidExplicitReturnArrows: true }],
+            errors: [METHOD_ERROR]
+        },
+
+        // async generators
+        {
+            code: "({ a: async function*() {} })",
+            output: "({ async *a() {} })",
+            options: ["always"],
+            errors: [METHOD_ERROR]
+        },
+        {
+            code: "({ async* a() {} })",
+            output: "({ a: async function*() {} })",
+            options: ["never"],
+            errors: [LONGFORM_METHOD_ERROR]
+        },
+
+        // typescript: arrow function should preserve the return value
+        {
+            code: unIndent`
+                const test = {
+                    key: (): void => {x()},
+                    key: ( (): void => {x()} ),
+                    key: ( (): (void) => {x()} ),
+
+                    key: (arg: t): void => {x()},
+                    key: ( (arg: t): void => {x()} ),
+                    key: ( (arg: t): (void) => {x()} ),
+
+                    key: (arg: t, arg2: t): void => {x()},
+                    key: ( (arg: t, arg2: t): void => {x()} ),
+                    key: ( (arg: t, arg2: t): (void) => {x()} ),
+
+                    key: async (): void => {x()},
+                    key: ( async (): void => {x()} ),
+                    key: ( async (): (void) => {x()} ),
+
+                    key: async (arg: t): void => {x()},
+                    key: ( async (arg: t): void => {x()} ),
+                    key: ( async (arg: t): (void) => {x()} ),
+
+                    key: async (arg: t, arg2: t): void => {x()},
+                    key: ( async (arg: t, arg2: t): void => {x()} ),
+                    key: ( async (arg: t, arg2: t): (void) => {x()} ),
+                }
+            `,
+            output: unIndent`
+                const test = {
+                    key(): void {x()},
+                    key(): void {x()},
+                    key(): (void) {x()},
+
+                    key(arg: t): void {x()},
+                    key(arg: t): void {x()},
+                    key(arg: t): (void) {x()},
+
+                    key(arg: t, arg2: t): void {x()},
+                    key(arg: t, arg2: t): void {x()},
+                    key(arg: t, arg2: t): (void) {x()},
+
+                    async key(): void {x()},
+                    async key(): void {x()},
+                    async key(): (void) {x()},
+
+                    async key(arg: t): void {x()},
+                    async key(arg: t): void {x()},
+                    async key(arg: t): (void) {x()},
+
+                    async key(arg: t, arg2: t): void {x()},
+                    async key(arg: t, arg2: t): void {x()},
+                    async key(arg: t, arg2: t): (void) {x()},
+                }
+            `,
+            options: ["always", { avoidExplicitReturnArrows: true }],
+            parser: require.resolve("../../fixtures/parsers/typescript-parsers/object-with-arrow-fn-props"),
+            errors: Array(18).fill(METHOD_ERROR)
         }
     ]
 });

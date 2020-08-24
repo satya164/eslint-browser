@@ -1,6 +1,6 @@
 # enforce consistent linebreak style for operators (operator-linebreak)
 
-When a statement is too long to fit on a single line, line breaks are generally inserted next to the operators separating expressions. The first style coming to mind would be to place the operator at the end of the line, following the english punctuation rules.
+When a statement is too long to fit on a single line, line breaks are generally inserted next to the operators separating expressions. The first style coming to mind would be to place the operator at the end of the line, following the English punctuation rules.
 
 ```js
 var fullHeight = borderTop +
@@ -22,7 +22,7 @@ This rule enforces a consistent linebreak style for operators.
 
 ## Options
 
-This rule has one option, which can be a string option or an object option.
+This rule has two options, a string option and an object option.
 
 String option:
 
@@ -38,7 +38,7 @@ The default configuration is `"after", { "overrides": { "?": "before", ":": "bef
 
 ### after
 
-Examples of **incorrect** code for this rule with the default `"after"` option:
+Examples of **incorrect** code for this rule with the `"after"` option:
 
 ```js
 /*eslint operator-linebreak: ["error", "after"]*/
@@ -62,7 +62,7 @@ answer = everything
   : foo;
 ```
 
-Examples of **correct** code for this rule with the default `"after"` option:
+Examples of **correct** code for this rule with the `"after"` option:
 
 ```js
 /*eslint operator-linebreak: ["error", "after"]*/
@@ -175,13 +175,24 @@ answer = everything ? 42 : foo;
 
 ### overrides
 
+Examples of additional **incorrect** code for this rule with the `{ "overrides": { "+=": "before" } }` option:
+
+```js
+/*eslint operator-linebreak: ["error", "after", { "overrides": { "+=": "before" } }]*/
+
+var thing = 'thing';
+thing +=
+  's';
+```
+
 Examples of additional **correct** code for this rule with the `{ "overrides": { "+=": "before" } }` option:
 
 ```js
 /*eslint operator-linebreak: ["error", "after", { "overrides": { "+=": "before" } }]*/
 
-var thing
-  += 'thing';
+var thing = 'thing';
+thing
+  += 's';
 ```
 
 Examples of additional **correct** code for this rule with the `{ "overrides": { "?": "ignore", ":": "ignore" } }` option:
@@ -198,6 +209,52 @@ answer = everything
   42
   :
   foo;
+```
+
+Examples of **incorrect** code for this rule with the default `"after", { "overrides": { "?": "before", ":": "before" } }` option:
+
+```js
+/*eslint operator-linebreak: ["error", "after", { "overrides": { "?": "before", ":": "before" } }]*/
+
+foo = 1
++
+2;
+
+foo = 1
+    + 2;
+
+foo
+    = 5;
+
+if (someCondition
+    || otherCondition) {
+}
+
+answer = everything ?
+  42 :
+  foo;
+```
+
+Examples of **correct** code for this rule with the default `"after", { "overrides": { "?": "before", ":": "before" } }` option:
+
+```js
+/*eslint operator-linebreak: ["error", "after", { "overrides": { "?": "before", ":": "before" } }]*/
+
+foo = 1 + 2;
+
+foo = 1 +
+      2;
+
+foo =
+    5;
+
+if (someCondition ||
+    otherCondition) {
+}
+
+answer = everything
+  ? 42
+  : foo;
 ```
 
 ## When Not To Use It

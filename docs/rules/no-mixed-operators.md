@@ -5,13 +5,41 @@ This rule warns when different operators are used consecutively without parenthe
 
 ```js
 var foo = a && b || c || d;    /*BAD: Unexpected mix of '&&' and '||'.*/
+var foo = a && b ? c : d;      /*BAD: Unexpected mix of '&&' and '?:'.*/
+var foo = (a && b) ? c : d;    /*GOOD*/
 var foo = (a && b) || c || d;  /*GOOD*/
 var foo = a && (b || c || d);  /*GOOD*/
 ```
 
+**Note:**
+It is expected for this rule to emit one error for each mixed operator in a pair. As a result, for each two consecutive mixed operators used, a distinct error will be displayed, pointing to where the specific operator that breaks the rule is used:
+
+```js
+var foo = a && b || c || d;
+```
+
+will generate
+
+```sh
+1:13  Unexpected mix of '&&' and '||'. (no-mixed-operators)
+1:18  Unexpected mix of '&&' and '||'. (no-mixed-operators)
+```
+
+```js
+var foo = a && b ? c : d;
+```
+
+will generate
+
+```sh
+1:13  Unexpected mix of '&&' and '?:'. (no-mixed-operators)
+1:18  Unexpected mix of '&&' and '?:'. (no-mixed-operators)
+```
+
+
 ## Rule Details
 
-This rule checks `BinaryExpression` and `LogicalExpression`.
+This rule checks `BinaryExpression`, `LogicalExpression` and `ConditionalExpression`.
 
 This rule may conflict with [no-extra-parens](no-extra-parens.md) rule.
 If you use both this and [no-extra-parens](no-extra-parens.md) rule together, you need to use the `nestedBinaryExpressions` option of [no-extra-parens](no-extra-parens.md) rule.
@@ -60,11 +88,9 @@ var foo = (a + b) * c;
 
 This rule has 2 options.
 
-* `groups` (`string[][]`) - specifies groups to compare operators.
-  When this rule compares two operators, if both operators are included in a same group, this rule checks it. Otherwise, this rule ignores it.
-  This value is a list of groups. The group is a list of binary operators.
-  Default is the groups for each kind of operators.
-* `allowSamePrecedence` (`boolean`) - specifies to allow mix of 2 operators if those have the same precedence. Default is `true`.
+* `groups` (`string[][]`) - specifies operator groups to be checked. The `groups` option is a list of groups, and a group is a list of binary operators. Default operator groups are defined as arithmetic, bitwise, comparison, logical, and relational operators. Note: Ternary operator(?:) can be part of any group and by default is allowed to be mixed with other operators.
+
+* `allowSamePrecedence` (`boolean`) - specifies whether to allow mixed operators if they are of equal precedence. Default is `true`.
 
 ### groups
 
@@ -74,13 +100,14 @@ The following operators can be used in `groups` option:
 * Bitwise Operators: `"&"`, `"|"`, `"^"`, `"~"`, `"<<"`, `">>"`, `">>>"`
 * Comparison Operators: `"=="`, `"!="`, `"==="`, `"!=="`, `">"`, `">="`, `"<"`, `"<="`
 * Logical Operators: `"&&"`, `"||"`
+* Coalesce Operator: `"??"`
 * Relational Operators: `"in"`, `"instanceof"`
+* Ternary Operator: `?:`
 
-Now, considers about `{"groups": [["&", "|", "^", "~", "<<", ">>", ">>>"], ["&&", "||"]]}` configure.
-This configure has 2 groups: bitwise operators and logical operators.
-This rule checks only if both operators are included in a same group.
-So, in this case, this rule comes to check between bitwise operators and between logical operators.
-This rule ignores other operators.
+Now, consider the following group configuration: `{"groups": [["&", "|", "^", "~", "<<", ">>", ">>>"], ["&&", "||"]]}`.
+There are 2 groups specified in this configuration: bitwise operators and logical operators.
+This rule checks if the operators belong to the same group only.
+In this case, this rule checks if bitwise operators and logical operators are mixed, but ignores all other operators.
 
 Examples of **incorrect** code for this rule with `{"groups": [["&", "|", "^", "~", "<<", ">>", ">>>"], ["&&", "||"]]}` option:
 
@@ -89,6 +116,12 @@ Examples of **incorrect** code for this rule with `{"groups": [["&", "|", "^", "
 
 var foo = a && b < 0 || c > 0 || d + 1 === 0;
 var foo = a & b | c;
+```
+
+```js
+/*eslint no-mixed-operators: ["error", {"groups": [["&&", "||", "?:"]]}]*/
+
+var foo = a || b ? c : d;
 ```
 
 Examples of **correct** code for this rule with `{"groups": [["&", "|", "^", "~", "<<", ">>", ">>>"], ["&&", "||"]]}` option:
@@ -105,6 +138,13 @@ var foo = a & (b | c);
 var foo = a + b * c;
 var foo = a + (b * c);
 var foo = (a + b) * c;
+```
+
+```js
+/*eslint no-mixed-operators: ["error", {"groups": [["&&", "||", "?:"]]}]*/
+
+var foo = (a || b) ? c : d;
+var foo = a || (b ? c : d);
 ```
 
 ### allowSamePrecedence
@@ -125,6 +165,15 @@ Examples of **incorrect** code for this rule with `{"allowSamePrecedence": false
 
 // + and - have the same precedence.
 var foo = a + b - c;
+```
+
+Examples of **correct** code for this rule with `{"allowSamePrecedence": false}` option:
+
+```js
+/*eslint no-mixed-operators: ["error", {"allowSamePrecedence": false}]*/
+
+// + and - have the same precedence.
+var foo = (a + b) - c;
 ```
 
 ## When Not To Use It

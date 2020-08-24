@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 
 const rule = require("../../../lib/rules/no-dupe-args"),
-    RuleTester = require("../../../lib/testers/rule-tester");
+    { RuleTester } = require("../../../lib/rule-tester");
 
 //------------------------------------------------------------------------------
 // Tests
@@ -27,13 +27,13 @@ ruleTester.run("no-dupe-args", rule, {
         { code: "function foo([[a, b], [c, d]]) {}", parserOptions: { ecmaVersion: 6 } }
     ],
     invalid: [
-        { code: "function a(a, b, b) {}", errors: [{ message: "Duplicate param 'b'." }] },
-        { code: "function a(a, a, a) {}", errors: [{ message: "Duplicate param 'a'." }] },
-        { code: "function a(a, b, a) {}", errors: [{ message: "Duplicate param 'a'." }] },
-        { code: "function a(a, b, a, b) {}", errors: [{ message: "Duplicate param 'a'." }, { message: "Duplicate param 'b'." }] },
-        { code: "var a = function(a, b, b) {}", errors: [{ message: "Duplicate param 'b'." }] },
-        { code: "var a = function(a, a, a) {}", errors: [{ message: "Duplicate param 'a'." }] },
-        { code: "var a = function(a, b, a) {}", errors: [{ message: "Duplicate param 'a'." }] },
-        { code: "var a = function(a, b, a, b) {}", errors: [{ message: "Duplicate param 'a'." }, { message: "Duplicate param 'b'." }] }
+        { code: "function a(a, b, b) {}", errors: [{ messageId: "unexpected", data: { name: "b" } }] },
+        { code: "function a(a, a, a) {}", errors: [{ messageId: "unexpected", data: { name: "a" } }] },
+        { code: "function a(a, b, a) {}", errors: [{ messageId: "unexpected", data: { name: "a" } }] },
+        { code: "function a(a, b, a, b) {}", errors: [{ messageId: "unexpected", data: { name: "a" } }, { messageId: "unexpected", data: { name: "b" } }] },
+        { code: "var a = function(a, b, b) {}", errors: [{ messageId: "unexpected", data: { name: "b" } }] },
+        { code: "var a = function(a, a, a) {}", errors: [{ messageId: "unexpected", data: { name: "a" } }] },
+        { code: "var a = function(a, b, a) {}", errors: [{ messageId: "unexpected", data: { name: "a" } }] },
+        { code: "var a = function(a, b, a, b) {}", errors: [{ messageId: "unexpected", data: { name: "a" } }, { messageId: "unexpected", data: { name: "b" } }] }
     ]
 });

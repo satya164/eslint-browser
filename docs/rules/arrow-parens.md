@@ -52,7 +52,7 @@ This rule has a string option and an object one.
 String options are:
 
 * `"always"` (default) requires parens around arguments in all cases.
-* `"as-needed"` allows omitting parens when there is only one argument.
+* `"as-needed"` enforces no braces where they can be omitted.
 
 Object properties for variants of the `"as-needed"` option:
 
@@ -71,7 +71,7 @@ a => a;
 a => {'\n'};
 a.then(foo => {});
 a.then(foo => a);
-a(foo => { if (true) {}; });
+a(foo => { if (true) {} });
 ```
 
 Examples of **correct** code for this rule with the default `"always"` option:
@@ -85,12 +85,12 @@ Examples of **correct** code for this rule with the default `"always"` option:
 (a) => a;
 (a) => {'\n'}
 a.then((foo) => {});
-a.then((foo) => { if (true) {}; });
+a.then((foo) => { if (true) {} });
 ```
 
 #### If Statements
 
-One of benefits of this option is that it prevents the incorrect use of arrow functions in conditionals:
+One of the benefits of this option is that it prevents the incorrect use of arrow functions in conditionals:
 
 ```js
 /*eslint-env es6*/
@@ -102,7 +102,7 @@ if (a => b) {
  console.log('bigger');
 } else {
  console.log('smaller');
-};
+}
 // outputs 'bigger', not smaller as expected
 ```
 
@@ -120,7 +120,7 @@ if ((a) => b) {
  console.log('truthy value returned');
 } else {
  console.log('falsey value returned');
-};
+}
 // outputs 'truthy value returned'
 ```
 
@@ -158,7 +158,10 @@ Examples of **incorrect** code for this rule with the `"as-needed"` option:
 (a) => {'\n'};
 a.then((foo) => {});
 a.then((foo) => a);
-a((foo) => { if (true) {}; });
+a((foo) => { if (true) {} });
+const f = /** @type {number} */(a) => a + a;
+const g = /* comment */ (a) => a + a;
+const h = (a) /* comment */ => a + a;
 ```
 
 Examples of **correct** code for this rule with the `"as-needed"` option:
@@ -172,11 +175,14 @@ a => {};
 a => a;
 a => {'\n'};
 a.then(foo => {});
-a.then(foo => { if (true) {}; });
+a.then(foo => { if (true) {} });
 (a, b, c) => a;
 (a = 10) => a;
 ([a, b]) => a;
 ({a, b}) => a;
+const f = (/** @type {number} */a) => a + a;
+const g = (/* comment */ a) => a + a;
+const h = (a /* comment */) => a + a;
 ```
 
 ### requireForBlockBody
@@ -209,8 +215,8 @@ a => ({});
 () => {};
 a => a;
 a.then((foo) => {});
-a.then((foo) => { if (true) {}; });
-a((foo) => { if (true) {}; });
+a.then((foo) => { if (true) {} });
+a((foo) => { if (true) {} });
 (a, b, c) => a;
 (a = 10) => a;
 ([a, b]) => a;

@@ -10,13 +10,23 @@
 //------------------------------------------------------------------------------
 
 const rule = require("../../../lib/rules/dot-notation"),
-    RuleTester = require("../../../lib/testers/rule-tester");
+    { RuleTester } = require("../../../lib/rule-tester");
 
 //------------------------------------------------------------------------------
 // Helpers
 //------------------------------------------------------------------------------
 
 const ruleTester = new RuleTester();
+
+/**
+ * Quote a string in "double quotes" because it’s painful
+ * with a double-quoted string literal
+ * @param   {string} str The string to quote
+ * @returns {string}     `"${str}"`
+ */
+function q(str) {
+    return `"${str}"`;
+}
 
 ruleTester.run("dot-notation", rule, {
     valid: [
@@ -40,62 +50,84 @@ ruleTester.run("dot-notation", rule, {
         { code: "a.null;", options: [{ allowKeywords: true }] },
         { code: "a['snake_case'];", options: [{ allowPattern: "^[a-z]+(_[a-z]+)+$" }] },
         { code: "a['lots_of_snake_case'];", options: [{ allowPattern: "^[a-z]+(_[a-z]+)+$" }] },
+        { code: "a[`time${range}`];", parserOptions: { ecmaVersion: 6 } },
+        { code: "a[`while`];", options: [{ allowKeywords: false }], parserOptions: { ecmaVersion: 6 } },
+        { code: "a[`time range`];", parserOptions: { ecmaVersion: 6 } },
         "a.true;",
         "a.null;",
         "a[undefined];",
         "a[void 0];",
-        "a[b()];"
+        "a[b()];",
+        { code: "a[/(?<zero>0)/];", parserOptions: { ecmaVersion: 2018 } }
     ],
     invalid: [
         {
             code: "a.true;",
+            output: "a[\"true\"];",
             options: [{ allowKeywords: false }],
-            errors: [{ message: ".true is a syntax error." }],
-            output: "a[\"true\"];"
+            errors: [{ messageId: "useBrackets", data: { key: "true" } }]
         },
         {
             code: "a['true'];",
-            errors: [{ message: "[\"true\"] is better written in dot notation." }],
-            output: "a.true;"
+            output: "a.true;",
+            errors: [{ messageId: "useDot", data: { key: q("true") } }]
+        },
+        {
+            code: "a[`time`];",
+            output: "a.time;",
+            parserOptions: { ecmaVersion: 6 },
+            errors: [{ messageId: "useDot", data: { key: "`time`" } }]
         },
         {
             code: "a[null];",
-            errors: [{ message: "[null] is better written in dot notation." }],
-            output: "a.null;"
+            output: "a.null;",
+            errors: [{ messageId: "useDot", data: { key: "null" } }]
+        },
+        {
+            code: "a[true];",
+            output: "a.true;",
+            errors: [{ messageId: "useDot", data: { key: "true" } }]
+        },
+        {
+            code: "a[false];",
+            output: "a.false;",
+            errors: [{ messageId: "useDot", data: { key: "false" } }]
         },
         {
             code: "a['b'];",
-            errors: [{ message: "[\"b\"] is better written in dot notation." }],
-            output: "a.b;"
+            output: "a.b;",
+            errors: [{ messageId: "useDot", data: { key: q("b") } }]
         },
         {
             code: "a.b['c'];",
-            errors: [{ message: "[\"c\"] is better written in dot notation." }],
-            output: "a.b.c;"
+            output: "a.b.c;",
+            errors: [{ messageId: "useDot", data: { key: q("c") } }]
         },
         {
             code: "a['_dangle'];",
-            options: [{ allowPattern: "^[a-z]+(_[a-z]+)+$" }], errors: [{ message: "[\"_dangle\"] is better written in dot notation." }],
-            output: "a._dangle;"
+            output: "a._dangle;",
+            options: [{ allowPattern: "^[a-z]+(_[a-z]+)+$" }],
+            errors: [{ messageId: "useDot", data: { key: q("_dangle") } }]
         },
         {
             code: "a['SHOUT_CASE'];",
+            output: "a.SHOUT_CASE;",
             options: [{ allowPattern: "^[a-z]+(_[a-z]+)+$" }],
-            errors: [{ message: "[\"SHOUT_CASE\"] is better written in dot notation." }],
-            output: "a.SHOUT_CASE;"
+            errors: [{ messageId: "useDot", data: { key: q("SHOUT_CASE") } }]
         },
         {
             code:
                 "a\n" +
                 "  ['SHOUT_CASE'];",
-            errors: [{
-                message: "[\"SHOUT_CASE\"] is better written in dot notation.",
-                line: 2,
-                column: 4
-            }],
             output:
                 "a\n" +
-                "  .SHOUT_CASE;"
+                "  .SHOUT_CASE;",
+            errors: [{
+                messageId: "useDot",
+                data: { key: q("SHOUT_CASE") },
+                line: 2,
+                column: 4
+            }]
         },
         {
             code:
@@ -104,55 +136,116 @@ ruleTester.run("dot-notation", rule, {
             "    [\"catch\"](function(){})\n" +
             "    .then(function(){})\n" +
             "    [\"catch\"](function(){});",
-            errors: [
-                {
-                    message: "[\"catch\"] is better written in dot notation.",
-                    line: 3,
-                    column: 6
-                },
-                {
-                    message: "[\"catch\"] is better written in dot notation.",
-                    line: 5,
-                    column: 6
-                }
-            ],
             output:
             "getResource()\n" +
             "    .then(function(){})\n" +
             "    .catch(function(){})\n" +
             "    .then(function(){})\n" +
-            "    .catch(function(){});"
+            "    .catch(function(){});",
+            errors: [
+                {
+                    messageId: "useDot",
+                    data: { key: q("catch") },
+                    line: 3,
+                    column: 6
+                },
+                {
+                    messageId: "useDot",
+                    data: { key: q("catch") },
+                    line: 5,
+                    column: 6
+                }
+            ]
         },
         {
             code:
             "foo\n" +
             "  .while;",
-            options: [{ allowKeywords: false }],
-            errors: [{ message: ".while is a syntax error." }],
             output:
             "foo\n" +
-            "  [\"while\"];"
+            "  [\"while\"];",
+            options: [{ allowKeywords: false }],
+            errors: [{ messageId: "useBrackets", data: { key: "while" } }]
         },
         {
             code: "foo[ /* comment */ 'bar' ]",
-            errors: [{ message: "[\"bar\"] is better written in dot notation." }],
-            output: "foo[ /* comment */ 'bar' ]" // Not fixed due to comment
+            output: null, // Not fixed due to comment
+            errors: [{ messageId: "useDot", data: { key: q("bar") } }]
         },
         {
             code: "foo[ 'bar' /* comment */ ]",
-            errors: [{ message: "[\"bar\"] is better written in dot notation." }],
-            output: "foo[ 'bar' /* comment */ ]" // Not fixed due to comment
+            output: null, // Not fixed due to comment
+            errors: [{ messageId: "useDot", data: { key: q("bar") } }]
         },
         {
             code: "foo[    'bar'    ];",
-            errors: [{ message: "[\"bar\"] is better written in dot notation." }],
-            output: "foo.bar;"
+            output: "foo.bar;",
+            errors: [{ messageId: "useDot", data: { key: q("bar") } }]
         },
         {
             code: "foo. /* comment */ while",
+            output: null, // Not fixed due to comment
             options: [{ allowKeywords: false }],
-            errors: [{ message: ".while is a syntax error." }],
-            output: "foo. /* comment */ while" // Not fixed due to comment
+            errors: [{ messageId: "useBrackets", data: { key: "while" } }]
+        },
+        {
+            code: "foo[('bar')]",
+            output: "foo.bar",
+            errors: [{ messageId: "useDot", data: { key: q("bar") } }]
+        },
+        {
+            code: "foo[(null)]",
+            output: "foo.null",
+            errors: [{ messageId: "useDot", data: { key: "null" } }]
+        },
+        {
+            code: "(foo)['bar']",
+            output: "(foo).bar",
+            errors: [{ messageId: "useDot", data: { key: q("bar") } }]
+        },
+        {
+            code: "1['toString']",
+            output: "1 .toString",
+            errors: [{ messageId: "useDot", data: { key: q("toString") } }]
+        },
+        {
+            code: "foo['bar']instanceof baz",
+            output: "foo.bar instanceof baz",
+            errors: [{ messageId: "useDot", data: { key: q("bar") } }]
+        },
+        {
+            code: "let.if()",
+            output: null, // `let["if"]()` is a syntax error because `let[` indicates a destructuring variable declaration
+            options: [{ allowKeywords: false }],
+            errors: [{ messageId: "useBrackets", data: { key: "if" } }]
+        },
+
+        // Optional chaining
+        {
+            code: "obj?.['prop']",
+            output: "obj?.prop",
+            parserOptions: { ecmaVersion: 2020 },
+            errors: [{ messageId: "useDot", data: { key: q("prop") } }]
+        },
+        {
+            code: "0?.['prop']",
+            output: "0?.prop",
+            parserOptions: { ecmaVersion: 2020 },
+            errors: [{ messageId: "useDot", data: { key: q("prop") } }]
+        },
+        {
+            code: "obj?.true",
+            output: "obj?.[\"true\"]",
+            options: [{ allowKeywords: false }],
+            parserOptions: { ecmaVersion: 2020 },
+            errors: [{ messageId: "useBrackets", data: { key: "true" } }]
+        },
+        {
+            code: "let?.true",
+            output: "let?.[\"true\"]",
+            options: [{ allowKeywords: false }],
+            parserOptions: { ecmaVersion: 2020 },
+            errors: [{ messageId: "useBrackets", data: { key: "true" } }]
         }
     ]
 });

@@ -1,4 +1,4 @@
-# Disallow Regexs That Look Like Division (no-div-regex)
+# Disallow Regular Expressions That Look Like Division (no-div-regex)
 
 Require regex literals to escape division operators.
 
@@ -23,7 +23,7 @@ Examples of **correct** code for this rule:
 ```js
 /*eslint no-div-regex: "error"*/
 
-function bar() { return /\=foo/; }
+function bar() { return /[=]foo/; }
 ```
 
 ## Related Rules

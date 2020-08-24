@@ -10,7 +10,7 @@
 //------------------------------------------------------------------------------
 
 const rule = require("../../../lib/rules/sort-vars"),
-    RuleTester = require("../../../lib/testers/rule-tester");
+    { RuleTester } = require("../../../lib/rule-tester");
 
 //------------------------------------------------------------------------------
 // Tests
@@ -18,7 +18,7 @@ const rule = require("../../../lib/rules/sort-vars"),
 
 const ruleTester = new RuleTester(),
     expectedError = {
-        message: "Variables within the same declaration block should be sorted alphabetically.",
+        messageId: "sortVars",
         type: "VariableDeclarator"
     },
     ignoreCaseArgs = [{ ignoreCase: true }];
@@ -39,21 +39,41 @@ ruleTester.run("sort-vars", rule, {
         { code: "var {A, b, C} = x;", options: ignoreCaseArgs, parserOptions: { ecmaVersion: 6 } },
         { code: "var test = [1,2,3];", parserOptions: { ecmaVersion: 6 } },
         { code: "var {a,b} = [1,2];", parserOptions: { ecmaVersion: 6 } },
-        { code: "var [a, B, c] = [1, 2, 3];", options: ignoreCaseArgs,
-            parserOptions: { ecmaVersion: 6 } },
-        { code: "var [A, B, c] = [1, 2, 3];", options: ignoreCaseArgs,
-            parserOptions: { ecmaVersion: 6 } },
-        { code: "var [A, b, C] = [1, 2, 3];", options: ignoreCaseArgs,
-            parserOptions: { ecmaVersion: 6 } },
+        {
+            code: "var [a, B, c] = [1, 2, 3];",
+            options: ignoreCaseArgs,
+            parserOptions: { ecmaVersion: 6 }
+        },
+        {
+            code: "var [A, B, c] = [1, 2, 3];",
+            options: ignoreCaseArgs,
+            parserOptions: { ecmaVersion: 6 }
+        },
+        {
+            code: "var [A, b, C] = [1, 2, 3];",
+            options: ignoreCaseArgs,
+            parserOptions: { ecmaVersion: 6 }
+        },
         { code: "let {a, b, c} = x;", parserOptions: { ecmaVersion: 6 } },
-        { code: "let [a, b, c] = [1, 2, 3];",
-            parserOptions: { ecmaVersion: 6 } },
-        { code: "const {a, b, c} = {a: 1, b: true, c: \"Moo\"};", options: ignoreCaseArgs,
-            parserOptions: { ecmaVersion: 6 } },
-        { code: "const [a, b, c] = [1, true, \"Moo\"];", options: ignoreCaseArgs,
-            parserOptions: { ecmaVersion: 6 } },
-        { code: "const [c, a, b] = [1, true, \"Moo\"];", options: ignoreCaseArgs,
-            parserOptions: { ecmaVersion: 6 } },
+        {
+            code: "let [a, b, c] = [1, 2, 3];",
+            parserOptions: { ecmaVersion: 6 }
+        },
+        {
+            code: "const {a, b, c} = {a: 1, b: true, c: \"Moo\"};",
+            options: ignoreCaseArgs,
+            parserOptions: { ecmaVersion: 6 }
+        },
+        {
+            code: "const [a, b, c] = [1, true, \"Moo\"];",
+            options: ignoreCaseArgs,
+            parserOptions: { ecmaVersion: 6 }
+        },
+        {
+            code: "const [c, a, b] = [1, true, \"Moo\"];",
+            options: ignoreCaseArgs,
+            parserOptions: { ecmaVersion: 6 }
+        },
         { code: "var {a, x: {b, c}} = {};", parserOptions: { ecmaVersion: 6 } },
         { code: "var {c, x: {a, c}} = {};", parserOptions: { ecmaVersion: 6 } },
         { code: "var {a, x: [b, c]} = {};", parserOptions: { ecmaVersion: 6 } },
@@ -64,35 +84,176 @@ ruleTester.run("sort-vars", rule, {
         { code: "var [b, {x: {a, c}}] = {};", parserOptions: { ecmaVersion: 6 } },
         { code: "var [b, d, a, c] = {};", parserOptions: { ecmaVersion: 6 } },
         { code: "var e, [a, c, d] = {};", parserOptions: { ecmaVersion: 6 } },
-        { code: "var a, [E, c, D] = [];", options: ignoreCaseArgs,
-            parserOptions: { ecmaVersion: 6 } },
+        {
+            code: "var a, [E, c, D] = [];",
+            options: ignoreCaseArgs,
+            parserOptions: { ecmaVersion: 6 }
+        },
         { code: "var a, f, [e, c, d] = [1,2,3];", parserOptions: { ecmaVersion: 6 } },
-        { code: [
-            "export default class {",
-            "    render () {",
-            "        let {",
-            "            b",
-            "        } = this,",
-            "            a,",
-            "            c;",
-            "    }",
-            "}"
-        ].join("\n"), env: { es6: true }, parserOptions: { sourceType: "module" } }
+        {
+            code: [
+                "export default class {",
+                "    render () {",
+                "        let {",
+                "            b",
+                "        } = this,",
+                "            a,",
+                "            c;",
+                "    }",
+                "}"
+            ].join("\n"),
+            parserOptions: { ecmaVersion: 6, sourceType: "module" },
+            env: { es6: true }
+        },
+
+        {
+            code: "var {} = 1, a",
+            options: ignoreCaseArgs,
+            parserOptions: { ecmaVersion: 6 }
+        }
     ],
     invalid: [
-        { code: "var b, a", errors: [expectedError] },
-        { code: "var b=10, a=20;", errors: [expectedError] },
-        { code: "var all=10, a = 1", errors: [expectedError] },
-        { code: "var b, c, a, d", errors: [expectedError] },
-        { code: "var c, d, a, b", errors: 2 },
-        { code: "var a, A;", errors: [expectedError] },
-        { code: "var a, B;", errors: [expectedError] },
-        { code: "var a, B, c;", errors: [expectedError] },
-        { code: "var B, a;", options: ignoreCaseArgs, errors: [expectedError] },
-        { code: "var B, A, c;", options: ignoreCaseArgs, errors: [expectedError] },
-        { code: "var d, a, [b, c] = {};", options: ignoreCaseArgs,
-            parserOptions: { ecmaVersion: 6 }, errors: [expectedError] },
-        { code: "var d, a, [b, {x: {c, e}}] = {};", options: ignoreCaseArgs,
-            parserOptions: { ecmaVersion: 6 }, errors: [expectedError] }
+        {
+            code: "var b, a",
+            output: "var a, b",
+            errors: [expectedError]
+        },
+        {
+            code: "var b , a",
+            output: "var a , b",
+            errors: [expectedError]
+        },
+        {
+            code: [
+                "var b,",
+                "    a;"
+            ].join("\n"),
+            output: [
+                "var a,",
+                "    b;"
+            ].join("\n"),
+            errors: [expectedError]
+        },
+        {
+            code: "var b=10, a=20;",
+            output: "var a=20, b=10;",
+            errors: [expectedError]
+        },
+        {
+            code: "var b=10, a=20, c=30;",
+            output: "var a=20, b=10, c=30;",
+            errors: [expectedError]
+        },
+        {
+            code: "var all=10, a = 1",
+            output: "var a = 1, all=10",
+            errors: [expectedError]
+        },
+        {
+            code: "var b, c, a, d",
+            output: "var a, b, c, d",
+            errors: [expectedError]
+        },
+        {
+            code: "var c, d, a, b",
+            output: "var a, b, c, d",
+            errors: 2
+        },
+        {
+            code: "var a, A;",
+            output: "var A, a;",
+            errors: [expectedError]
+        },
+        {
+            code: "var a, B;",
+            output: "var B, a;",
+            errors: [expectedError]
+        },
+        {
+            code: "var a, B, c;",
+            output: "var B, a, c;",
+            errors: [expectedError]
+        },
+        {
+            code: "var B, a;",
+            output: "var a, B;",
+            options: ignoreCaseArgs,
+            errors: [expectedError]
+        },
+        {
+            code: "var B, A, c;",
+            output: "var A, B, c;",
+            options: ignoreCaseArgs,
+            errors: [expectedError]
+        },
+        {
+            code: "var d, a, [b, c] = {};",
+            output: "var a, d, [b, c] = {};",
+            options: ignoreCaseArgs,
+            parserOptions: { ecmaVersion: 6 },
+            errors: [expectedError]
+        },
+        {
+            code: "var d, a, [b, {x: {c, e}}] = {};",
+            output: "var a, d, [b, {x: {c, e}}] = {};",
+            options: ignoreCaseArgs,
+            parserOptions: { ecmaVersion: 6 },
+            errors: [expectedError]
+        },
+        {
+            code: "var {} = 1, b, a",
+            output: "var {} = 1, a, b",
+            options: ignoreCaseArgs,
+            parserOptions: { ecmaVersion: 6 },
+            errors: [expectedError]
+        },
+        {
+            code: "var b=10, a=f();",
+            output: null,
+            errors: [expectedError]
+        },
+        {
+            code: "var b=10, a=b;",
+            output: null,
+            errors: [expectedError]
+        },
+        {
+            code: "var b = 0, a = `${b}`;",
+            output: null,
+            parserOptions: { ecmaVersion: 6 },
+            errors: [expectedError]
+        },
+        {
+            code: "var b = 0, a = `${f()}`",
+            output: null,
+            parserOptions: { ecmaVersion: 6 },
+            errors: [expectedError]
+        },
+        {
+            code: "var b = 0, c = b, a;",
+            output: null,
+            errors: [expectedError]
+        },
+        {
+            code: "var b = 0, c = 0, a = b + c;",
+            output: null,
+            errors: [expectedError]
+        },
+        {
+            code: "var b = f(), c, d, a;",
+            output: null,
+            errors: [expectedError]
+        },
+        {
+            code: "var b = `${f()}`, c, d, a;",
+            output: null,
+            parserOptions: { ecmaVersion: 6 },
+            errors: [expectedError]
+        },
+        {
+            code: "var c, a = b = 0",
+            output: null,
+            errors: [expectedError]
+        }
     ]
 });

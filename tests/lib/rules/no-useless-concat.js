@@ -1,5 +1,5 @@
 /**
- * @fileoverview disallow unncessary concatenation of literals or template literals
+ * @fileoverview disallow unnecessary concatenation of literals or template literals
  * @author Henry Zhu
  */
 "use strict";
@@ -10,7 +10,7 @@
 
 const rule = require("../../../lib/rules/no-useless-concat"),
 
-    RuleTester = require("../../../lib/testers/rule-tester");
+    { RuleTester } = require("../../../lib/rule-tester");
 
 
 //------------------------------------------------------------------------------
@@ -22,17 +22,17 @@ const ruleTester = new RuleTester();
 ruleTester.run("no-useless-concat", rule, {
 
     valid: [
-        { code: "var a = 1 + 1;" },
-        { code: "var a = 1 * '2';" },
-        { code: "var a = 1 - 2;" },
-        { code: "var a = foo + bar;" },
-        { code: "var a = 'foo' + bar;" },
-        { code: "var foo = 'foo' +\n 'bar';" },
+        "var a = 1 + 1;",
+        "var a = 1 * '2';",
+        "var a = 1 - 2;",
+        "var a = foo + bar;",
+        "var a = 'foo' + bar;",
+        "var foo = 'foo' +\n 'bar';",
 
         // https://github.com/eslint/eslint/issues/3575
-        { code: "var string = (number + 1) + 'px';" },
-        { code: "'a' + 1" },
-        { code: "1 + '1'" },
+        "var string = (number + 1) + 'px';",
+        "'a' + 1",
+        "1 + '1'",
         { code: "1 + `1`", parserOptions: { ecmaVersion: 6 } },
         { code: "`1` + 1", parserOptions: { ecmaVersion: 6 } },
         { code: "(1 + +2) + `b`", parserOptions: { ecmaVersion: 6 } }
@@ -42,56 +42,78 @@ ruleTester.run("no-useless-concat", rule, {
         {
             code: "'a' + 'b'",
             errors: [
-                { message: "Unexpected string concatenation of literals." }
+                {
+                    messageId: "unexpectedConcat",
+                    line: 1,
+                    column: 5,
+                    endLine: 1,
+                    endColumn: 6
+                }
+            ]
+        },
+        {
+            code: "'a' +\n'b' + 'c'",
+            errors: [
+                {
+                    messageId: "unexpectedConcat",
+                    line: 2,
+                    column: 5,
+                    endLine: 2,
+                    endColumn: 6
+                }
             ]
         },
         {
             code: "foo + 'a' + 'b'",
             errors: [
-                { message: "Unexpected string concatenation of literals." }
+                { messageId: "unexpectedConcat" }
             ]
         },
         {
             code: "'a' + 'b' + 'c'",
             errors: [
                 {
-                    message: "Unexpected string concatenation of literals.",
+                    messageId: "unexpectedConcat",
                     line: 1,
-                    column: 5
+                    column: 5,
+                    endLine: 1,
+                    endColumn: 6
                 },
                 {
-                    message: "Unexpected string concatenation of literals.",
+                    messageId: "unexpectedConcat",
                     line: 1,
-                    column: 11
+                    column: 11,
+                    endLine: 1,
+                    endColumn: 12
                 }
             ]
         },
         {
             code: "(foo + 'a') + ('b' + 'c')",
             errors: [
-                { column: 13, message: "Unexpected string concatenation of literals." },
-                { column: 20, message: "Unexpected string concatenation of literals." }
+                { column: 13, messageId: "unexpectedConcat" },
+                { column: 20, messageId: "unexpectedConcat" }
             ]
         },
         {
             code: "`a` + 'b'",
             parserOptions: { ecmaVersion: 6 },
             errors: [
-                { message: "Unexpected string concatenation of literals." }
+                { messageId: "unexpectedConcat" }
             ]
         },
         {
             code: "`a` + `b`",
             parserOptions: { ecmaVersion: 6 },
             errors: [
-                { message: "Unexpected string concatenation of literals." }
+                { messageId: "unexpectedConcat" }
             ]
         },
         {
             code: "foo + `a` + `b`",
             parserOptions: { ecmaVersion: 6 },
             errors: [
-                { message: "Unexpected string concatenation of literals." }
+                { messageId: "unexpectedConcat" }
             ]
         }
     ]
