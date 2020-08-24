@@ -39,6 +39,7 @@
   "dependencies": {
     "@babel/code-frame": "^7.0.0",
     "ajv": "^6.10.0",
+    "babel-eslint": "^10.1.0",
     "chalk": "^4.0.0",
     "cross-spawn": "^7.0.2",
     "debug": "^4.0.1",
