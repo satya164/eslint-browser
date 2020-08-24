@@ -4,7 +4,7 @@ const path = require("path");
 const fs = require("fs");
 
 const plugins = {
-    babel: "rules",
+    "@babel/eslint-plugin": "lib/rules",
     flowtype: "dist/rules",
     react: "lib/rules",
     "react-native": "lib/rules"
